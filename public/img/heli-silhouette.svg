@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 100" fill="#ffffff" fill-opacity="0.16">
+  <!-- main rotor blade -->
+  <rect x="14" y="22" width="148" height="3" rx="1.5" />
+  <!-- mast -->
+  <rect x="86" y="25" width="3" height="11" />
+  <!-- fuselage -->
+  <path d="M30 55 Q30 36 86 36 L138 36 Q160 36 168 52 L168 64 L30 64 Q22 64 22 57 Z" />
+  <!-- cockpit window highlight -->
+  <path d="M40 46 Q40 41 52 41 L62 41 L66 56 L40 56 Q36 52 40 46 Z" fill="#ffffff" fill-opacity="0.06" />
+  <!-- tail boom -->
+  <path d="M160 50 L200 53 L200 59 L160 61 Z" />
+  <!-- tail rotor / vertical fin -->
+  <path d="M198 45 L210 35 L210 68 L198 58 Z" />
+  <!-- skids -->
+  <rect x="42" y="76" width="112" height="2.5" rx="1" />
+  <rect x="52" y="64" width="2" height="14" />
+  <rect x="142" y="64" width="2" height="14" />
+</svg>
