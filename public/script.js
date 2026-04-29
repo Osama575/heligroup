@@ -26,11 +26,38 @@
 // ---------- Mobile nav ----------
 const navToggle = document.querySelector(".nav-toggle");
 const nav = document.querySelector(".nav");
-navToggle?.addEventListener("click", () => nav.classList.toggle("is-open"));
 
-// ---------- Smooth-scroll: close mobile nav on click ----------
+navToggle?.addEventListener("click", () => {
+  nav.classList.toggle("is-open");
+  // Collapse any open dropdowns when nav closes.
+  if (!nav.classList.contains("is-open")) {
+    document.querySelectorAll(".has-dropdown.is-open")
+      .forEach((li) => li.classList.remove("is-open"));
+  }
+});
+
+// ---------- Mobile dropdown toggle ----------
+document.querySelectorAll(".has-dropdown > a").forEach((a) => {
+  a.addEventListener("click", (e) => {
+    if (window.innerWidth > 960) return; // desktop uses CSS hover
+    e.preventDefault();
+    const li = a.closest(".has-dropdown");
+    const isNowOpen = !li.classList.contains("is-open");
+    // Close any sibling dropdowns first.
+    document.querySelectorAll(".has-dropdown.is-open")
+      .forEach((other) => other.classList.remove("is-open"));
+    li.classList.toggle("is-open", isNowOpen);
+  });
+});
+
+// ---------- Smooth-scroll: close mobile nav on link click ----------
 document.querySelectorAll(".nav a").forEach((a) => {
-  a.addEventListener("click", () => nav.classList.remove("is-open"));
+  a.addEventListener("click", () => {
+    if (a.closest(".has-dropdown") && window.innerWidth <= 960) return; // handled above
+    nav.classList.remove("is-open");
+    document.querySelectorAll(".has-dropdown.is-open")
+      .forEach((li) => li.classList.remove("is-open"));
+  });
 });
 
 // ---------- Chat widget ----------

@@ -995,6 +995,9 @@ img { max-width: 100%; display: block; }
     gap: 0;
   }
   .nav.is-open .dropdown {
+    display: none; /* hidden until the parent li gets .is-open */
+  }
+  .nav.is-open .has-dropdown.is-open .dropdown {
     position: static;
     display: flex;
     box-shadow: none;
