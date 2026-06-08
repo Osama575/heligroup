@@ -1,26 +1,118 @@
 // THEHELIGROUP — landing page interactions + chat widget.
 
-// ---------- Hero video graceful fallback ----------
-// If no <source> file loads (404, missing format, etc.), hide the video so the
-// hero-media background image shows through. Without this, the empty <video>
-// element can render as a black box on some browsers.
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ---------- Theme toggle ----------
 (() => {
-  const heroVideo = document.querySelector(".hero-video");
-  if (!heroVideo) return;
-  const sources = heroVideo.querySelectorAll("source");
-  let failed = 0;
-  sources.forEach((s) => {
-    s.addEventListener("error", () => {
-      failed += 1;
-      if (failed >= sources.length) heroVideo.classList.add("is-failed");
+  const root = document.documentElement;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const themeBg = { dark: "#0a0f1a", light: "#f4f6fa" };
+
+  function apply(theme) {
+    root.setAttribute("data-theme", theme);
+    try { localStorage.setItem("hg-theme", theme); } catch (e) {}
+    if (meta) meta.setAttribute("content", themeBg[theme] || themeBg.dark);
+  }
+
+  document.querySelectorAll("[data-theme-toggle]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+      apply(next);
     });
   });
-  // Also hide if the video itself errors out.
-  heroVideo.addEventListener("error", () => heroVideo.classList.add("is-failed"));
-  // If after 2.5s nothing has started loading, treat as failed.
-  setTimeout(() => {
-    if (heroVideo.readyState === 0) heroVideo.classList.add("is-failed");
-  }, 2500);
+})();
+
+// ---------- Header: condense on scroll ----------
+(() => {
+  const header = document.querySelector("[data-header]");
+  if (!header) return;
+  let ticking = false;
+  const update = () => {
+    header.classList.toggle("is-scrolled", window.scrollY > 40);
+    ticking = false;
+  };
+  update();
+  window.addEventListener("scroll", () => {
+    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+  }, { passive: true });
+})();
+
+// ---------- Hero parallax ----------
+(() => {
+  const img = document.querySelector(".hero-img[data-parallax]");
+  const hero = document.querySelector(".hero");
+  if (!img || !hero || reduceMotion) return;
+  let ticking = false;
+  const update = () => {
+    const rect = hero.getBoundingClientRect();
+    if (rect.bottom > 0 && rect.top < window.innerHeight) {
+      const shift = Math.min(window.scrollY, hero.offsetHeight) * 0.18;
+      img.style.transform = `translate3d(0, ${shift}px, 0) scale(1.06)`;
+    }
+    ticking = false;
+  };
+  update();
+  window.addEventListener("scroll", () => {
+    if (!ticking) { requestAnimationFrame(update); ticking = true; }
+  }, { passive: true });
+})();
+
+// ---------- Scroll reveal ----------
+(() => {
+  const items = document.querySelectorAll("[data-reveal]");
+  if (!items.length) return;
+
+  if (!("IntersectionObserver" in window) || reduceMotion) {
+    items.forEach((el) => el.classList.add("is-visible"));
+    return;
+  }
+
+  const io = new IntersectionObserver((entries, obs) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+
+  items.forEach((el) => io.observe(el));
+
+  // Safety net: if anything is still hidden after load (e.g. a non-scrolling
+  // headless render), reveal it so content is never stuck invisible.
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      document.querySelectorAll("[data-reveal]:not(.is-visible)").forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight) el.classList.add("is-visible");
+      });
+    }, 600);
+  });
+})();
+
+// ---------- Scroll-spy: active nav link ----------
+(() => {
+  const links = Array.from(document.querySelectorAll('.nav a[href^="#"]'));
+  if (!links.length || !("IntersectionObserver" in window)) return;
+  const map = new Map();
+  links.forEach((a) => {
+    const id = a.getAttribute("href").slice(1);
+    const sec = document.getElementById(id);
+    if (sec) map.set(sec, a);
+  });
+  if (!map.size) return;
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        links.forEach((l) => l.classList.remove("active"));
+        const active = map.get(entry.target);
+        if (active) active.classList.add("active");
+      }
+    });
+  }, { rootMargin: "-45% 0px -50% 0px" });
+
+  map.forEach((_, sec) => io.observe(sec));
 })();
 
 // ---------- Mobile nav ----------
@@ -28,35 +120,35 @@ const navToggle = document.querySelector(".nav-toggle");
 const nav = document.querySelector(".nav");
 
 navToggle?.addEventListener("click", () => {
-  nav.classList.toggle("is-open");
-  // Collapse any open dropdowns when nav closes.
-  if (!nav.classList.contains("is-open")) {
-    document.querySelectorAll(".has-dropdown.is-open")
-      .forEach((li) => li.classList.remove("is-open"));
+  const open = nav.classList.toggle("is-open");
+  navToggle.classList.toggle("is-active", open);
+  navToggle.setAttribute("aria-expanded", String(open));
+  if (!open) {
+    document.querySelectorAll(".has-dropdown.is-open").forEach((li) => li.classList.remove("is-open"));
   }
 });
 
 // ---------- Mobile dropdown toggle ----------
 document.querySelectorAll(".has-dropdown > a").forEach((a) => {
   a.addEventListener("click", (e) => {
-    if (window.innerWidth > 960) return; // desktop uses CSS hover
+    if (window.innerWidth > 860) return; // desktop uses CSS hover
     e.preventDefault();
     const li = a.closest(".has-dropdown");
     const isNowOpen = !li.classList.contains("is-open");
-    // Close any sibling dropdowns first.
-    document.querySelectorAll(".has-dropdown.is-open")
-      .forEach((other) => other.classList.remove("is-open"));
+    document.querySelectorAll(".has-dropdown.is-open").forEach((other) => other.classList.remove("is-open"));
     li.classList.toggle("is-open", isNowOpen);
+    a.setAttribute("aria-expanded", String(isNowOpen));
   });
 });
 
-// ---------- Smooth-scroll: close mobile nav on link click ----------
+// ---------- Close mobile nav on link click ----------
 document.querySelectorAll(".nav a").forEach((a) => {
   a.addEventListener("click", () => {
-    if (a.closest(".has-dropdown") && window.innerWidth <= 960) return; // handled above
+    if (a.closest(".has-dropdown") && window.innerWidth <= 860) return; // handled above
     nav.classList.remove("is-open");
-    document.querySelectorAll(".has-dropdown.is-open")
-      .forEach((li) => li.classList.remove("is-open"));
+    navToggle?.classList.remove("is-active");
+    navToggle?.setAttribute("aria-expanded", "false");
+    document.querySelectorAll(".has-dropdown.is-open").forEach((li) => li.classList.remove("is-open"));
   });
 });
 
@@ -89,6 +181,11 @@ function closeChat() {
 
 launcher?.addEventListener("click", openChat);
 closeBtn?.addEventListener("click", closeChat);
+
+// Any "Talk to the team" / "Start a chat" CTA opens the widget.
+document.querySelectorAll("[data-open-chat]").forEach((btn) => {
+  btn.addEventListener("click", openChat);
+});
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && panel.classList.contains("is-open")) closeChat();
