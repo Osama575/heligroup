@@ -1434,3 +1434,325 @@ html.js .svc-row:nth-child(4) { transition-delay: 0.15s; }
     scroll-behavior: auto !important;
   }
 }
+
+
+/* ============================================================
+   DAZZLE ENHANCEMENT LAYER — premium polish pass
+   ============================================================ */
+
+/* --- Hero headline gradient text --- */
+.hero h1 {
+  background: linear-gradient(
+    128deg,
+    #fff 0%,
+    oklch(0.96 0.008 256) 48%,
+    oklch(0.78 0.19 25)  84%,
+    oklch(0.70 0.22 25) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+}
+
+/* --- Hero ambient glow orbs (sit above scrim, below content) --- */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 52% 58% at 65% 38%, oklch(0.62 0.205 25 / 0.16) 0%, transparent 68%),
+    radial-gradient(ellipse 40% 55% at 15% 75%, oklch(0.14 0.03 258 / 0.55) 0%, transparent 80%);
+  animation: hero-orb 11s ease-in-out infinite alternate;
+}
+@keyframes hero-orb {
+  0%   { transform: scale(1)    translate(0,   0);   opacity: 0.80; }
+  50%  { transform: scale(1.06) translate(2%,  3%);  opacity: 1;    }
+  100% { transform: scale(0.96) translate(-2%, -3%); opacity: 0.72; }
+}
+
+/* --- Hero sub text glow --- */
+.hero-sub {
+  text-shadow: 0 0 40px oklch(0.14 0.03 258 / 0.6);
+}
+
+/* --- Scroll-line — brighter accent sweep --- */
+.hero-scroll-line::after {
+  background: linear-gradient(90deg, transparent, var(--accent), #fff 80%, transparent);
+}
+
+/* --- Primary button shimmer sweep --- */
+.btn--primary {
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}
+.btn--primary::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -70%;
+  width: 42%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(1 0 0 / 0.22),
+    transparent
+  );
+  transform: skewX(-18deg);
+  animation: btn-sweep 4.5s ease-in-out 1.2s infinite;
+  pointer-events: none;
+}
+@keyframes btn-sweep {
+  0%, 100% { left: -70%; opacity: 0; }
+  8%        { opacity: 1; }
+  40%       { left: 130%; opacity: 0; }
+}
+
+/* Ghost button shimmer on hover */
+.btn--ghost {
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* --- Pillar cards — accent top line reveal on hover --- */
+.pillar::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--accent) 40%, var(--accent-strong) 60%, transparent 100%);
+  opacity: 0;
+  transform: scaleX(0.4);
+  transition: opacity 0.45s var(--ease-out), transform 0.5s var(--ease-out);
+  z-index: 3;
+  pointer-events: none;
+}
+.pillar:hover::before {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* --- Fleet cards — diagonal light sweep on hover --- */
+.fleet-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    118deg,
+    transparent 30%,
+    oklch(1 0 0 / 0.07) 48%,
+    oklch(1 0 0 / 0.10) 52%,
+    transparent 68%
+  );
+  transform: translateX(-130%) skewX(-10deg);
+  transition: transform 0.75s var(--ease-out-quint);
+}
+@media (hover: hover) and (pointer: fine) {
+  .fleet-card:hover::before { transform: translateX(170%) skewX(-10deg); }
+}
+
+/* --- Why-icons — glow on hover --- */
+.why-icon {
+  transition:
+    transform    0.32s var(--ease-out),
+    background   0.32s var(--ease),
+    box-shadow   0.32s var(--ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .why-item:hover .why-icon {
+    background: oklch(0.62 0.205 25 / 0.24);
+    box-shadow: 0 0 28px oklch(0.62 0.205 25 / 0.45), 0 0 8px oklch(0.62 0.205 25 / 0.3);
+    transform: scale(1.10);
+  }
+}
+
+/* --- Figure numbers — gradient ink --- */
+.figure-num {
+  background: linear-gradient(135deg, var(--ink) 0%, oklch(0.80 0.16 25) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- About section — dot-grid texture --- */
+.section--about {
+  position: relative;
+}
+.section--about::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle, oklch(1 0 0 / 0.035) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+.section--about .container { position: relative; z-index: 1; }
+
+/* --- Fleet section — dot-grid texture --- */
+.section--fleet {
+  position: relative;
+}
+.section--fleet::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle, oklch(1 0 0 / 0.03) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+.section--fleet .container { position: relative; z-index: 1; }
+
+/* --- Quote section — warm ambient glow --- */
+.section--quote {
+  position: relative;
+  overflow: hidden;
+}
+.section--quote::before {
+  content: "";
+  position: absolute;
+  left: -8%;
+  top: 0;
+  bottom: 0;
+  width: 55%;
+  background: radial-gradient(ellipse at 10% 50%, oklch(0.62 0.205 25 / 0.07) 0%, transparent 68%);
+  pointer-events: none;
+}
+blockquote p {
+  position: relative;
+}
+blockquote::before {
+  opacity: 0.50;
+  background: linear-gradient(135deg, var(--accent), oklch(0.80 0.22 25));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- svc-row — sliding left accent bar --- */
+.svc-row {
+  position: relative;
+  overflow: hidden;
+}
+.svc-row::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 0;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+  opacity: 0.8;
+  transition: width 0.30s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .svc-row:hover::before { width: 3px; }
+}
+
+/* --- Contact section — ambient accent glow (right side) --- */
+.section--contact {
+  position: relative;
+}
+.section--contact::before {
+  content: "";
+  position: absolute;
+  right: -5%; top: 15%; bottom: 15%;
+  width: 40%;
+  background: radial-gradient(ellipse at 100% 50%, oklch(0.62 0.205 25 / 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.section--contact .container { position: relative; z-index: 1; }
+
+/* --- Nav links — animated underline --- */
+.nav li { position: relative; }
+.nav a {
+  position: relative;
+}
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: 13px; right: 13px;
+  bottom: 4px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.24s var(--ease-out);
+}
+.nav a:hover::after,
+.nav a.active::after { transform: scaleX(1); }
+
+/* --- Chat launcher — stronger presence --- */
+.chat-launcher {
+  background: linear-gradient(135deg, var(--surface) 60%, var(--surface-2) 100%);
+  box-shadow: var(--shadow), 0 0 0 1px var(--accent-soft);
+}
+@media (hover: hover) and (pointer: fine) {
+  .chat-launcher:hover {
+    background: var(--surface-2);
+    box-shadow: var(--shadow-lg), 0 0 20px oklch(0.62 0.205 25 / 0.20);
+  }
+}
+.chat-launcher-icon {
+  filter: drop-shadow(0 0 6px oklch(0.62 0.205 25 / 0.55));
+}
+
+/* --- Chat launcher — stronger pulse ring --- */
+@keyframes launcher-pulse {
+  0%   { opacity: 0;    transform: scale(0.96); }
+  20%  { opacity: 0.55; }
+  100% { opacity: 0;    transform: scale(1.10); }
+}
+
+/* --- Chat panel — subtle gradient header --- */
+.chat-header {
+  background: linear-gradient(135deg, var(--surface-2) 0%, var(--bg-2) 100%);
+}
+
+/* --- Reveal — slightly more dramatic entrance --- */
+html.js [data-reveal] {
+  transform: translateY(28px);
+  filter: blur(4px);
+}
+
+/* --- About figures — wider accent line on reveal --- */
+.about-figures.is-visible li::before {
+  transition: width 1.4s var(--ease-out-quint);
+}
+
+/* --- Trust track — accent dots brighter --- */
+.trust-track .dot {
+  color: var(--accent);
+  opacity: 0.75;
+  text-shadow: 0 0 8px oklch(0.62 0.205 25 / 0.6);
+}
+
+/* --- Hero marks — hover glow --- */
+.hero-marks li {
+  transition:
+    background-color 0.28s var(--ease),
+    border-color     0.28s var(--ease),
+    color            0.28s var(--ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .hero-marks li:hover {
+    background: oklch(0.62 0.205 25 / 0.22);
+    border-color: oklch(0.62 0.205 25 / 0.50);
+    color: #fff;
+  }
+}
+
+/* --- Reduced motion safety net --- */
+@media (prefers-reduced-motion: reduce) {
+  .hero::before          { animation: none !important; }
+  .btn--primary::after   { animation: none !important; }
+  .fleet-card::before    { transition: none !important; }
+}

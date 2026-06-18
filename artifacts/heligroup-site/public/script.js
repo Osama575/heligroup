@@ -311,3 +311,52 @@ form.addEventListener("submit", async (e) => {
     input.focus();
   }
 });
+
+// ---------- Figure counter animation ----------
+(() => {
+  const figures = document.querySelector(".about-figures");
+  if (!figures || !("IntersectionObserver" in window) || reduceMotion) return;
+
+  const items = figures.querySelectorAll(".figure-num");
+
+  function easeOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
+
+  function animateCount(el, target, suffix, prefix, duration) {
+    const start = performance.now();
+    const from = target > 100 ? target - 8 : 0;
+
+    function tick(now) {
+      const elapsed = Math.min((now - start) / duration, 1);
+      const value = from + Math.round((target - from) * easeOutQuint(elapsed));
+      el.textContent = prefix + value + suffix;
+      if (elapsed < 1) requestAnimationFrame(tick);
+      else el.textContent = prefix + target + suffix;
+    }
+    requestAnimationFrame(tick);
+  }
+
+  const io = new IntersectionObserver((entries, obs) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      obs.unobserve(entry.target);
+
+      items.forEach((el, i) => {
+        const raw = el.dataset.raw || el.textContent.trim();
+        el.dataset.raw = raw;
+
+        const delay = i * 130;
+        setTimeout(() => {
+          if (raw === "2017")      animateCount(el, 2017, "", "",   1600);
+          else if (raw === "100%") animateCount(el, 100,  "%", "", 1400);
+          else {
+            // non-numeric: flash highlight instead
+            el.style.transition = "color 0.4s ease";
+            el.style.setProperty("--ink", "var(--accent)");
+          }
+        }, delay);
+      });
+    });
+  }, { threshold: 0.5 });
+
+  io.observe(figures);
+})();
