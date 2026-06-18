@@ -1,21 +1,16 @@
 {
-  "name": "heligroup-demo",
-  "version": "1.0.0",
-  "description": "Landing page + Claude-powered chat agent demo for THEHELIGROUP",
-  "main": "server.js",
-  "type": "module",
+  "name": "workspace",
+  "version": "0.0.0",
+  "license": "MIT",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
+    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
   },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0",
-    "date-holidays": "^3.27.0",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.2",
-    "googleapis": "^171.4.0",
-    "luxon": "^3.7.2",
-    "nodemailer": "^8.0.7",
-    "twilio": "^6.0.0"
+  "private": true,
+  "devDependencies": {
+    "prettier": "^3.8.3",
+    "typescript": "~5.9.3"
   }
 }
