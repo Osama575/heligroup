@@ -4,3 +4,6 @@ node_modules/
 *.log
 *.jsonl
 google-sa-key.json
+
+# CMS runtime uploads (kept out of source; created at runtime)
+public/img/uploads/

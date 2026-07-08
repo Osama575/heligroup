@@ -6,7 +6,7 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 (() => {
   const root = document.documentElement;
   const meta = document.querySelector('meta[name="theme-color"]');
-  const themeBg = { dark: "#0a0f1a", light: "#f4f6fa" };
+  const themeBg = { dark: "#0e1420", light: "#f2f4f8" };
 
   function apply(theme) {
     root.setAttribute("data-theme", theme);

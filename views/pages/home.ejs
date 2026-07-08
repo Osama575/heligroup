@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<%- include('../partials/head', { title: content.home.seoTitle, desc: content.home.seoDescription, content: content }) %>
+</head>
+<body>
+<%- include('../partials/header', { content: content, currentHref: '/' }) %>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-frame">
+      <img class="hero-img" data-parallax src="<%= content.home.hero.image %>" alt="<%= content.home.hero.imageAlt %>" fetchpriority="high" decoding="async" />
+      <div class="hero-scrim" aria-hidden="true"></div>
+    </div>
+    <div class="hero-content">
+      <p class="kicker kicker--light" data-reveal><span class="kicker-dot" aria-hidden="true"></span><%= content.home.hero.kicker %></p>
+      <h1 data-reveal><%= content.home.hero.heading %></h1>
+      <p class="hero-sub" data-reveal><%= content.home.hero.sub %></p>
+      <div class="hero-cta" data-reveal>
+        <button class="btn btn--primary" data-open-chat>
+          <%= content.home.hero.primaryCtaLabel %>
+          <span class="btn-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+        </button>
+        <a class="btn btn--ghost" href="<%= content.home.hero.secondaryCtaHref %>"><%= content.home.hero.secondaryCtaLabel %></a>
+      </div>
+    </div>
+    <ul class="hero-marks" aria-label="Approvals" data-reveal>
+      <% content.home.marks.forEach(function (m) { %><li><%= m %></li><% }); %>
+    </ul>
+    <a class="hero-scroll" href="#about" aria-label="Scroll to content"><span>Scroll</span><span class="hero-scroll-line" aria-hidden="true"></span></a>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section section--about" id="about">
+    <div class="container about-grid">
+      <div class="about-lead" data-reveal>
+        <p class="kicker"><%= content.home.about.kicker %></p>
+        <h2 class="display-2"><%= content.home.about.heading %></h2>
+      </div>
+      <div class="about-body" data-reveal>
+        <% content.home.about.body.forEach(function (p) { %><p><%= p %></p><% }); %>
+        <ul class="about-figures">
+          <% content.home.about.figures.forEach(function (f) { %>
+            <li><span class="figure-num"><%= f.num %></span><span class="figure-label"><%= f.label %></span></li>
+          <% }); %>
+        </ul>
+      </div>
+      <figure class="about-photo" data-reveal>
+        <img src="<%= content.home.about.image %>" alt="<%= content.home.about.imageAlt %>" loading="lazy" decoding="async" />
+      </figure>
+    </div>
+  </section>
+
+  <!-- WHAT WE DO: teaser to Services + Training -->
+  <section class="section section--pillars">
+    <div class="container">
+      <header class="section-head" data-reveal>
+        <h2 class="display-2">Two approvals. One team.</h2>
+      </header>
+      <div class="pillars">
+        <article class="pillar" data-reveal>
+          <div class="pillar-media">
+            <img src="<%= content.services.maintenance.image %>" alt="<%= content.services.maintenance.imageAlt %>" loading="lazy" decoding="async" />
+            <span class="pillar-code">145</span>
+          </div>
+          <div class="pillar-body">
+            <p class="pillar-tag"><%= content.services.maintenance.tag %></p>
+            <h3><%= content.services.maintenance.title %></h3>
+            <p><%= content.services.maintenance.body %></p>
+            <a class="link-arrow" href="/services">Explore maintenance <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+        <article class="pillar" data-reveal>
+          <div class="pillar-media">
+            <img src="<%= content.training.pillar.image %>" alt="<%= content.training.pillar.imageAlt %>" loading="lazy" decoding="async" />
+            <span class="pillar-code">147</span>
+          </div>
+          <div class="pillar-body">
+            <p class="pillar-tag"><%= content.training.pillar.tag %></p>
+            <h3><%= content.training.pillar.title %></h3>
+            <p><%= content.training.pillar.body %></p>
+            <a class="link-arrow" href="/training">Explore training <span aria-hidden="true">→</span></a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section class="section section--why">
+    <div class="container">
+      <header class="section-head" data-reveal>
+        <h2 class="display-2"><%= content.home.why.heading %></h2>
+      </header>
+      <div class="why-row">
+        <% content.home.why.items.forEach(function (item) { %>
+          <div class="why-item" data-reveal>
+            <span class="why-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <h3><%= item.title %></h3>
+            <p><%= item.body %></p>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="section section--quote">
+    <div class="container">
+      <blockquote data-reveal>
+        <p>“<%= content.home.quote.text %>”</p>
+        <footer><cite><%= content.home.quote.cite %></cite><span><%= content.home.quote.meta %></span></footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- TRUSTED -->
+  <section class="section section--trusted" id="trusted">
+    <div class="container"><h2 class="trusted-title" data-reveal><%= content.home.trustedTitle %></h2></div>
+    <div class="trust-marquee" aria-hidden="true">
+      <div class="trust-track">
+        <% for (var pass = 0; pass < 2; pass++) { content.home.trustedMarks.forEach(function (m) { %><span><%= m %></span><span class="dot">·</span><% }); } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section--cta">
+    <div class="container cta-inner" data-reveal>
+      <h2 class="display-2">Aircraft grounded, or planning ahead?</h2>
+      <p>Either way, the fastest route in is a conversation. Tell us the type and the task.</p>
+      <div class="cta-actions">
+        <button class="btn btn--primary" data-open-chat>Talk to the team <span class="btn-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
+        <a class="btn btn--outline" href="/contact">Contact details</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<%- include('../partials/footer', { content: content }) %>
+<%- include('../partials/chat', { content: content }) %>
+<%- include('../partials/scripts') %>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<%- include('../partials/head', { title: content.fleet.seoTitle, desc: content.fleet.seoDescription, content: content }) %>
+</head>
+<body>
+<%- include('../partials/header', { content: content, currentHref: '/fleet' }) %>
+
+<main id="main">
+
+  <section class="page-hero">
+    <div class="container">
+      <p class="kicker" data-reveal><span class="kicker-dot" aria-hidden="true"></span><%= content.fleet.hero.kicker %></p>
+      <h1 class="display-1" data-reveal><%= content.fleet.hero.heading %></h1>
+      <p class="page-hero-sub" data-reveal><%= content.fleet.hero.sub %></p>
+    </div>
+  </section>
+
+  <section class="section section--fleet">
+    <div class="container">
+      <div class="fleet-grid">
+        <% content.fleet.types.forEach(function (t) { %>
+          <article class="fleet-card<%= t.featured ? ' fleet-card--featured' : '' %>" data-reveal>
+            <div class="fleet-photo" style="--photo:url('<%= t.image %>')"></div>
+            <div class="fleet-meta">
+              <span class="fleet-make"><%= t.make %></span>
+              <h3><%= t.model %></h3>
+              <% if (t.note) { %><p><%= t.note %></p><% } %>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--cta">
+    <div class="container cta-inner" data-reveal>
+      <h2 class="display-2">Your type not on the list?</h2>
+      <p>Ask anyway. We'll be straight about whether we can help or point you to who can.</p>
+      <div class="cta-actions">
+        <button class="btn btn--primary" data-open-chat>Ask about your type <span class="btn-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
+        <a class="btn btn--outline" href="/contact">Contact details</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<%- include('../partials/footer', { content: content }) %>
+<%- include('../partials/chat', { content: content }) %>
+<%- include('../partials/scripts') %>
+</body>
+</html>

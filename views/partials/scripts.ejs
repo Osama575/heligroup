@@ -1,0 +1,15 @@
+<!-- Visit beacon: notifies the owner on each real (JS-capable) page load. -->
+<script>
+  (function () {
+    try {
+      var payload = JSON.stringify({ path: location.pathname, ref: document.referrer });
+      var blob = new Blob([payload], { type: "application/json" });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon("/api/visit", blob);
+      } else {
+        fetch("/api/visit", { method: "POST", headers: { "Content-Type": "application/json" }, body: payload, keepalive: true });
+      }
+    } catch (e) { /* never block the page on analytics */ }
+  })();
+</script>
+<script src="/script.js" defer></script>

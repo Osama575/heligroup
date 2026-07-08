@@ -5,7 +5,7 @@
       "src": "server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["lib/**", "public/**", "business-context.js"],
+        "includeFiles": ["lib/**", "public/**", "views/**", "content/**", "business-context.js"],
         "maxDuration": 60
       }
     }

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<%- include('../partials/head', { title: content.training.seoTitle, desc: content.training.seoDescription, content: content }) %>
+</head>
+<body>
+<%- include('../partials/header', { content: content, currentHref: '/training' }) %>
+
+<main id="main">
+
+  <section class="page-hero">
+    <div class="container">
+      <p class="kicker" data-reveal><span class="kicker-dot" aria-hidden="true"></span><%= content.training.hero.kicker %></p>
+      <h1 class="display-1" data-reveal><%= content.training.hero.heading %></h1>
+      <p class="page-hero-sub" data-reveal><%= content.training.hero.sub %></p>
+    </div>
+  </section>
+
+  <section class="section section--feature" id="heli147">
+    <div class="container">
+      <div class="feature feature--reverse">
+        <figure class="feature-media" data-reveal>
+          <img src="<%= content.training.pillar.image %>" alt="<%= content.training.pillar.imageAlt %>" loading="lazy" decoding="async" />
+          <span class="feature-code">147</span>
+        </figure>
+        <div class="feature-body" data-reveal>
+          <p class="pillar-tag"><%= content.training.pillar.tag %></p>
+          <h2 class="display-2"><%= content.training.pillar.title %></h2>
+          <p><%= content.training.pillar.body %></p>
+          <button class="link-arrow" data-open-chat><%= content.training.pillar.ctaLabel %> <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--index">
+    <div class="container">
+      <header class="section-head" data-reveal>
+        <h2 class="display-2">How the training works.</h2>
+      </header>
+      <ul class="svc-index svc-index--cards" data-reveal>
+        <% content.training.points.forEach(function (s) { %>
+          <li class="svc-row">
+            <span class="svc-no"><%= s.no %></span>
+            <div class="svc-text"><h3><%= s.title %></h3><p><%= s.body %></p></div>
+            <span class="svc-meta"><%= s.meta %></span>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--cta">
+    <div class="container cta-inner" data-reveal>
+      <h2 class="display-2">Training a single engineer or a whole team?</h2>
+      <p>Tell us the type and the timeframe. We'll come back with options.</p>
+      <div class="cta-actions">
+        <button class="btn btn--primary" data-open-chat>Enquire about courses <span class="btn-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
+        <a class="btn btn--outline" href="/contact">Contact details</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<%- include('../partials/footer', { content: content }) %>
+<%- include('../partials/chat', { content: content }) %>
+<%- include('../partials/scripts') %>
+</body>
+</html>

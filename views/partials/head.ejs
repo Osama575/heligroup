@@ -1,0 +1,31 @@
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title><%= title %></title>
+<meta name="description" content="<%= desc %>" />
+<meta property="og:title" content="<%= title %>" />
+<meta property="og:description" content="<%= desc %>" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="/img/future-airbus-military-helicopters.jpg" />
+<meta name="theme-color" content="#0a0f1a" />
+<link rel="icon" href="/img/heli-silhouette.svg" type="image/svg+xml" />
+
+<!-- No-flash theme: set before first paint so there is no light/dark flicker -->
+<script>
+  (function () {
+    try {
+      var stored = localStorage.getItem("hg-theme");
+      var theme = stored || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+      document.documentElement.setAttribute("data-theme", theme);
+      var mc = document.querySelector('meta[name="theme-color"]');
+      if (mc) mc.setAttribute("content", theme === "light" ? "#f2f4f8" : "#0e1420");
+    } catch (e) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+    document.documentElement.classList.add("js");
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
