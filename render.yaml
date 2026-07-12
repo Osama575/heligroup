@@ -1,0 +1,33 @@
+# Render blueprint — persistent Node host with a mounted disk for CMS data.
+#
+# Deploy: push this repo to GitHub, then on render.com choose New → Blueprint and
+# pick it. A persistent Disk is what makes admin edits and uploaded images survive
+# redeploys — it's mounted at /data and DATA_DIR points the app at it.
+#
+# NOTE: attaching a Disk requires a paid instance type (Starter or higher). The
+# same pattern works on Railway/Fly (attach a volume, set DATA_DIR to its path) or
+# a plain VPS (DATA_DIR to any writable directory).
+
+services:
+  - type: web
+    name: heligroup
+    runtime: node
+    plan: starter
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /data          # must match the disk mountPath below
+      - key: ANTHROPIC_API_KEY
+        sync: false            # set in the Render dashboard (optional; chat only)
+      - key: ADMIN_PASSWORD
+        sync: false            # set in the Render dashboard
+      - key: ADMIN_SECRET
+        generateValue: true    # Render generates a strong signing secret
+    disk:
+      name: heligroup-data
+      mountPath: /data
+      sizeGB: 1

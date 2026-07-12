@@ -54,14 +54,15 @@
   </header>
 
   <div class="admin-shell">
-    <nav class="admin-nav" aria-label="Sections">
-      <a href="#s-site">Site &amp; contact</a>
-      <a href="#s-home">Home</a>
-      <a href="#s-services">Services</a>
-      <a href="#s-training">Training</a>
-      <a href="#s-fleet">Fleet</a>
-      <a href="#s-contact">Contact page</a>
-    </nav>
+    <div class="admin-tabs" role="tablist" aria-label="Sections">
+      <button type="button" class="admin-tab" role="tab" data-tab="s-site">Site &amp; contact</button>
+      <button type="button" class="admin-tab" role="tab" data-tab="s-home">Home</button>
+      <button type="button" class="admin-tab" role="tab" data-tab="s-services">Services</button>
+      <button type="button" class="admin-tab" role="tab" data-tab="s-training">Training</button>
+      <button type="button" class="admin-tab" role="tab" data-tab="s-fleet">Fleet</button>
+      <button type="button" class="admin-tab" role="tab" data-tab="s-contact">Contact page</button>
+      <button type="button" class="admin-tab" role="tab" data-tab="s-chatbot">Chatbot</button>
+    </div>
 
     <form id="ed-form" method="POST" action="/admin/save" class="admin-form">
       <input type="hidden" name="_csrf" value="<%= csrf %>" />
@@ -198,6 +199,15 @@
         <%- area("contact[hero][sub]", "Sub-text", content.contact.hero.sub, 2) %>
         <h3>Contact rows</h3>
         <%- arrayEditor("contact[rows]", content.contact.rows, [{ field: "key", label: "Label", type: "text" }, { field: "email", label: "Email", type: "text" }]) %>
+      </section>
+
+      <!-- CHATBOT -->
+      <section class="ed-section" id="s-chatbot">
+        <h2>Chatbot knowledge</h2>
+        <p class="ed-note">The site assistant treats these Q&amp;A pairs as the source of truth. Add the questions visitors actually ask and the answers you want given. Edits apply to new chats straight away.</p>
+        <%- area("chatbot[intro]", "Extra context (optional)", content.chatbot && content.chatbot.intro, 3) %>
+        <h3>Questions &amp; answers</h3>
+        <%- arrayEditor("chatbot[qa]", content.chatbot && content.chatbot.qa, [{ field: "q", label: "Question", type: "text" }, { field: "a", label: "Answer", type: "area" }]) %>
       </section>
 
       <div class="admin-save-bar">

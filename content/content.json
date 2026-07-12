@@ -14,11 +14,26 @@
     "ownerEmail": "foresightagencies@gmail.com"
   },
   "nav": [
-    { "label": "Home", "href": "/" },
-    { "label": "Services", "href": "/services" },
-    { "label": "Training", "href": "/training" },
-    { "label": "Fleet", "href": "/fleet" },
-    { "label": "Contact", "href": "/contact" }
+    {
+      "label": "Home",
+      "href": "/"
+    },
+    {
+      "label": "Services",
+      "href": "/services"
+    },
+    {
+      "label": "Training",
+      "href": "/training"
+    },
+    {
+      "label": "Fleet",
+      "href": "/fleet"
+    },
+    {
+      "label": "Contact",
+      "href": "/contact"
+    }
   ],
   "home": {
     "seoTitle": "THEHELIGROUP — Independent helicopter maintenance & training",
@@ -30,10 +45,15 @@
       "primaryCtaLabel": "Talk to the team",
       "secondaryCtaLabel": "Aircraft we support",
       "secondaryCtaHref": "/fleet",
-      "image": "/img/future-airbus-military-helicopters.jpg",
+      "image": "/img/uploads/97e545c9-6962-4573-824a-d5014d641952.webp",
       "imageAlt": "Twin-engine helicopters in formation against an overcast sky"
     },
-    "marks": ["UK CAA Part 145", "UK CAA Part 147", "EASA Part 147", "BHA · BBGA"],
+    "marks": [
+      "UK CAA Part 145",
+      "UK CAA Part 147",
+      "EASA Part 147",
+      "BHA · BBGA"
+    ],
     "about": {
       "kicker": "Who we are",
       "heading": "The only stand-alone Part 145 and Part 147 organisation in the UK.",
@@ -42,10 +62,22 @@
         "That independence is the whole point. No fleet of our own pulls engineers off your aircraft on a bad day. We mobilise quickly, stay competitive, and answer to you. The team are engineers, supervisors, mentors, instructors and assessors with decades on the airframe."
       ],
       "figures": [
-        { "num": "2017", "label": "Founded" },
-        { "num": "100%", "label": "Independent" },
-        { "num": "2-in-1", "label": "Part 145 + 147" },
-        { "num": "Global", "label": "Client base" }
+        {
+          "num": "2017",
+          "label": "Founded"
+        },
+        {
+          "num": "100%",
+          "label": "Independent"
+        },
+        {
+          "num": "2-in-1",
+          "label": "Part 145 + 147"
+        },
+        {
+          "num": "Global",
+          "label": "Client base"
+        }
       ],
       "image": "/img/EXPH-2269-177.jpg",
       "imageAlt": "A HELI145 engineer working on a helicopter airframe"
@@ -53,9 +85,18 @@
     "why": {
       "heading": "Three things that don't happen elsewhere.",
       "items": [
-        { "title": "Independent of any operator", "body": "No AOC commitments pulling our engineers off your aircraft when another fleet has a bad day." },
-        { "title": "Rapid mobilisation", "body": "A small, senior team and no committee. AOG calls go straight to a duty engineer, day or night." },
-        { "title": "Both sides, one roof", "body": "The only combined Part 145 and Part 147 set-up in the UK. Maintenance and training that actually talk to each other." }
+        {
+          "title": "Independent of any operator",
+          "body": "No AOC commitments pulling our engineers off your aircraft when another fleet has a bad day."
+        },
+        {
+          "title": "Rapid mobilisation",
+          "body": "A small, senior team and no committee. AOG calls go straight to a duty engineer, day or night."
+        },
+        {
+          "title": "Both sides, one roof",
+          "body": "The only combined Part 145 and Part 147 set-up in the UK. Maintenance and training that actually talk to each other."
+        }
       ]
     },
     "quote": {
@@ -64,7 +105,15 @@
       "meta": "500+ aircraft sold"
     },
     "trustedTitle": "Trusted around the world.",
-    "trustedMarks": ["UK CAA", "EASA", "BHA", "BBGA", "AW139", "AW169", "Norwich Int'l"]
+    "trustedMarks": [
+      "UK CAA",
+      "EASA",
+      "BHA",
+      "BBGA",
+      "AW139",
+      "AW169",
+      "Norwich Int'l"
+    ]
   },
   "services": {
     "seoTitle": "Services — HELI145 maintenance & technical support | THEHELIGROUP",
@@ -83,10 +132,30 @@
       "ctaLabel": "Enquire about maintenance"
     },
     "related": [
-      { "no": "01", "title": "Pre-Purchase Inspections", "body": "Independent PPI assessments so buyers know exactly what they're acquiring, before they sign.", "meta": "Worldwide" },
-      { "no": "02", "title": "HELICapture", "body": "Technical capture and documentation that gives your airworthiness records the rigour they deserve.", "meta": "Records" },
-      { "no": "03", "title": "Continued Airworthiness", "body": "Ongoing airworthiness management support, keeping your fleet legal, safe, and ready to fly.", "meta": "CAMO-style" },
-      { "no": "04", "title": "Technical Support", "body": "Engineering advice, troubleshooting and fleet support, drawn from decades on the frontline.", "meta": "On call" }
+      {
+        "no": "01",
+        "title": "Pre-Purchase Inspections",
+        "body": "Independent PPI assessments so buyers know exactly what they're acquiring, before they sign.",
+        "meta": "Worldwide"
+      },
+      {
+        "no": "02",
+        "title": "HELICapture",
+        "body": "Technical capture and documentation that gives your airworthiness records the rigour they deserve.",
+        "meta": "Records"
+      },
+      {
+        "no": "03",
+        "title": "Continued Airworthiness",
+        "body": "Ongoing airworthiness management support, keeping your fleet legal, safe, and ready to fly.",
+        "meta": "CAMO-style"
+      },
+      {
+        "no": "04",
+        "title": "Technical Support",
+        "body": "Engineering advice, troubleshooting and fleet support, drawn from decades on the frontline.",
+        "meta": "On call"
+      }
     ]
   },
   "training": {
@@ -106,10 +175,30 @@
       "ctaLabel": "Enquire about courses"
     },
     "points": [
-      { "no": "01", "title": "Approved types", "body": "Type training across the Leonardo AW and Airbus H ranges on the schedule. Ask about your specific type.", "meta": "AW · H" },
-      { "no": "02", "title": "UK CAA & EASA", "body": "Courses approved under both UK CAA and EASA Part 147, so your qualification travels.", "meta": "Dual" },
-      { "no": "03", "title": "Private cohorts", "body": "Single engineer or a full team. Private cohorts available for operators training a group.", "meta": "1 to many" },
-      { "no": "04", "title": "Flexible delivery", "body": "Norwich classroom, OEM facility, or on-site at your hangar. We work around your operation.", "meta": "On-site" }
+      {
+        "no": "01",
+        "title": "Approved types",
+        "body": "Type training across the Leonardo AW and Airbus H ranges on the schedule. Ask about your specific type.",
+        "meta": "AW · H"
+      },
+      {
+        "no": "02",
+        "title": "UK CAA & EASA",
+        "body": "Courses approved under both UK CAA and EASA Part 147, so your qualification travels.",
+        "meta": "Dual"
+      },
+      {
+        "no": "03",
+        "title": "Private cohorts",
+        "body": "Single engineer or a full team. Private cohorts available for operators training a group.",
+        "meta": "1 to many"
+      },
+      {
+        "no": "04",
+        "title": "Flexible delivery",
+        "body": "Norwich classroom, OEM facility, or on-site at your hangar. We work around your operation.",
+        "meta": "On-site"
+      }
     ]
   },
   "fleet": {
@@ -121,14 +210,62 @@
       "sub": "Leonardo and Airbus rotorcraft on the schedule for maintenance and type training. If your type isn't here, ask. We'll be straight with you."
     },
     "types": [
-      { "make": "Leonardo", "model": "AW109", "note": "", "featured": false, "image": "/img/types/aw109.jpg" },
-      { "make": "Leonardo", "model": "AW119", "note": "", "featured": false, "image": "/img/types/aw119.jpg" },
-      { "make": "Leonardo", "model": "AW139", "note": "Flagship medium twin. Heavy maintenance and B1.3 training.", "featured": true, "image": "/img/types/aw139.jpg" },
-      { "make": "Leonardo", "model": "AW169", "note": "Light intermediate. Full Part 145 and type training.", "featured": true, "image": "/img/types/aw169.jpg" },
-      { "make": "Leonardo", "model": "AW189", "note": "", "featured": false, "image": "/img/types/aw189.jpg" },
-      { "make": "Airbus", "model": "H125", "note": "", "featured": false, "image": "/img/types/h125.jpg" },
-      { "make": "Airbus", "model": "H145", "note": "", "featured": false, "image": "/img/types/h145.jpg" },
-      { "make": "Airbus", "model": "BK117 C2 / D2 / D3", "note": "", "featured": false, "image": "/img/types/bk117.jpg" }
+      {
+        "make": "Leonardo",
+        "model": "AW109",
+        "note": "",
+        "image": "/img/types/aw109.jpg",
+        "featured": false
+      },
+      {
+        "make": "Leonardo",
+        "model": "AW119",
+        "note": "",
+        "image": "/img/types/aw119.jpg",
+        "featured": false
+      },
+      {
+        "make": "Leonardo",
+        "model": "AW139",
+        "note": "Flagship medium twin. Heavy maintenance and B1.3 training.",
+        "image": "/img/types/aw139.jpg",
+        "featured": true
+      },
+      {
+        "make": "Leonardo",
+        "model": "AW169",
+        "note": "Light intermediate. Full Part 145 and type training.",
+        "image": "/img/types/aw169.jpg",
+        "featured": true
+      },
+      {
+        "make": "Leonardo",
+        "model": "AW189",
+        "note": "",
+        "image": "/img/types/aw189.jpg",
+        "featured": false
+      },
+      {
+        "make": "Airbus",
+        "model": "H125",
+        "note": "",
+        "image": "/img/types/h125.jpg",
+        "featured": false
+      },
+      {
+        "make": "Airbus",
+        "model": "H145",
+        "note": "",
+        "image": "/img/types/h145.jpg",
+        "featured": false
+      },
+      {
+        "make": "Airbus",
+        "model": "BK117 C2 / D2 / D3",
+        "note": "",
+        "image": "/img/types/bk117.jpg",
+        "featured": false
+      }
     ]
   },
   "contact": {
@@ -140,8 +277,43 @@
       "sub": "The fastest way in is the chat, bottom right. It asks the questions our team would ask and gets you in front of the right engineer."
     },
     "rows": [
-      { "key": "Maintenance", "email": "info@heli145.com" },
-      { "key": "Training", "email": "info@heli147.com" }
+      {
+        "key": "Maintenance",
+        "email": "info@heli145.com"
+      },
+      {
+        "key": "Training",
+        "email": "info@heli147.com"
+      }
+    ]
+  },
+  "chatbot": {
+    "intro": "",
+    "qa": [
+      {
+        "q": "What aircraft types do you support?",
+        "a": "On the schedule we cover Leonardo AW109, AW119, AW139, AW169 and AW189, plus Airbus H125, H145 and BK117 C2/D2/D3. If your type isn't listed, ask and we'll be straight about whether we can help."
+      },
+      {
+        "q": "What is the difference between HELI145 and HELI147?",
+        "a": "HELI145 is our UK CAA Part 145 maintenance and technical-support arm. HELI147 is our UK CAA and EASA Part 147 type-training arm. Same team, one roof."
+      },
+      {
+        "q": "Where are you based?",
+        "a": "Business Aviation Centre, Norwich International Airport, Norwich NR6 6JT, UK. We mobilise to operators worldwide."
+      },
+      {
+        "q": "Do you publish prices?",
+        "a": "No, quotes are issued per job after a quick enquiry so they're accurate and competitive. Tell us what you need and the team will come back with a figure."
+      },
+      {
+        "q": "My aircraft is grounded (AOG). What do I do?",
+        "a": "That's the fast lane. Tell me the type, registration, location and the snag, and I'll route it to the duty engineer straight away."
+      },
+      {
+        "q": "How do I book a Part 147 course?",
+        "a": "Tell me the type, whether you need UK CAA, EASA or both, and rough timing, and I'll get the HELI147 team to line it up. Private cohorts are available."
+      }
     ]
   }
 }

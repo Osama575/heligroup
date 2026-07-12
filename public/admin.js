@@ -98,6 +98,45 @@ window.addEventListener("beforeunload", (e) => {
   if (dirty) { e.preventDefault(); e.returnValue = ""; }
 });
 
+// ---------- Section tabs (show one panel at a time; all fields still submit) ----------
+(() => {
+  const tabs = Array.from(document.querySelectorAll("[data-tab]"));
+  if (!tabs.length) return;
+  const panel = (id) => document.getElementById(id);
+
+  function activate(id, fromClick) {
+    if (!panel(id)) id = tabs[0].dataset.tab;
+    tabs.forEach((t) => {
+      const on = t.dataset.tab === id;
+      t.classList.toggle("is-active", on);
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      const p = panel(t.dataset.tab);
+      if (p) p.hidden = !on;
+    });
+    try { localStorage.setItem("hg-admin-tab", id); } catch (e) {}
+    if (fromClick) {
+      history.replaceState(null, "", "#" + id);
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
+  }
+
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => activate(t.dataset.tab, true));
+    t.addEventListener("keydown", (e) => {
+      const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+      if (!(e.key in keys)) return;
+      e.preventDefault();
+      const next = tabs[(i + keys[e.key] + tabs.length) % tabs.length];
+      next.focus();
+      activate(next.dataset.tab, true);
+    });
+  });
+
+  let initial = (location.hash || "").slice(1);
+  if (!panel(initial)) { try { initial = localStorage.getItem("hg-admin-tab"); } catch (e) {} }
+  activate(panel(initial) ? initial : tabs[0].dataset.tab, false);
+})();
+
 // Auto-dismiss the saved/error toast.
 const toast = document.querySelector("[data-toast]");
 if (toast) setTimeout(() => toast.classList.add("is-gone"), 4000);

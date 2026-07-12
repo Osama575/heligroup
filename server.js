@@ -14,13 +14,16 @@ import cookieParser from "cookie-parser";
 import multer from "multer";
 import crypto from "crypto";
 import Anthropic from "@anthropic-ai/sdk";
+import sharp from "sharp";
 import { fileURLToPath } from "url";
 import path from "path";
-import { mkdirSync } from "fs";
+import { writeFile } from "fs/promises";
 
-import { SYSTEM_PROMPT } from "./business-context.js";
+import { SYSTEM_PROMPT, faqSystemBlock } from "./business-context.js";
 import { TOOLS, dispatchTool } from "./lib/tools.js";
 import { loadContent, saveContent } from "./lib/content.js";
+import { UPLOAD_DIR } from "./lib/paths.js";
+import { createRateLimiter } from "./lib/rate-limit.js";
 import {
   verifyPassword, issueSessionCookie, clearSessionCookie,
   getSession, requireAuth, csrfToken, verifyCsrf,
@@ -47,20 +50,34 @@ app.use(express.json({ limit: "256kb" }));
 app.use(express.urlencoded({ extended: true, limit: "512kb" }));
 app.use(cookieParser());
 app.use((_req, res, next) => { res.setHeader("X-Content-Type-Options", "nosniff"); next(); });
+// Serve uploaded images from UPLOAD_DIR (which lives on the persistent disk in
+// production, outside ./public). Names are server-generated UUIDs — validate
+// strictly against traversal, and cache hard since each name is immutable.
+const UPLOAD_NAME = /^[a-f0-9-]{36}\.(webp|jpg|jpeg|png|gif|avif)$/i;
+app.get("/img/uploads/:name", (req, res) => {
+  if (!UPLOAD_NAME.test(req.params.name)) return res.status(404).end();
+  res.sendFile(
+    path.join(UPLOAD_DIR, req.params.name),
+    { headers: { "Cache-Control": "public, max-age=31536000, immutable" } },
+    (err) => { if (err && !res.headersSent) res.status(404).end(); }
+  );
+});
+
 app.use(express.static(path.join(__dirname, "public"), { index: false }));
 
+// ---------- Rate limits (per IP; correct for a single persistent process) ----------
+const chatLimiter = createRateLimiter({ windowMs: 5 * 60_000, max: 20 });
+const uploadLimiter = createRateLimiter({ windowMs: 10 * 60_000, max: 40 });
+const visitLimiter = createRateLimiter({ windowMs: 10 * 60_000, max: 30 });
+
 // ---------- Uploads (admin only) ----------
-const UPLOAD_DIR = path.join(__dirname, "public", "img", "uploads");
-mkdirSync(UPLOAD_DIR, { recursive: true });
-const EXT = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "image/gif": ".gif", "image/avif": ".avif" };
+// Accept raster images only (no SVG), then re-encode to optimised WebP so a heavy
+// upload never slows the live site. Held in memory (max 5MB) then written to disk.
+const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]);
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
-    // Server-generated name from mimetype only — never trust the client filename.
-    filename: (_req, file, cb) => cb(null, crypto.randomUUID() + (EXT[file.mimetype] || "")),
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024, files: 1 },
-  fileFilter: (_req, file, cb) => cb(null, Boolean(EXT[file.mimetype])), // raster only; no SVG
+  fileFilter: (_req, file, cb) => cb(null, ALLOWED.has(file.mimetype)),
 });
 
 // ---------- Page routes ----------
@@ -71,6 +88,7 @@ for (const [route, view] of Object.entries(PAGES)) {
 
 // ---------- Visit notifier ----------
 app.post("/api/visit", (req, res) => {
+  if (!visitLimiter(req.ip).ok) return res.status(204).end();
   try {
     const { path: pagePath, ref } = req.body ?? {};
     notifyVisit({
@@ -150,7 +168,7 @@ const SAFE_HREF = /^(\/(?![\/\\])[A-Za-z0-9._\-\/#?=&%]*|#[A-Za-z0-9\-_]*|mailto
 const ARRAY_PATHS = [
   "site.address", "home.marks", "home.about.body", "home.about.figures",
   "home.why.items", "home.trustedMarks", "services.related", "training.points",
-  "fleet.types", "contact.rows", "nav",
+  "fleet.types", "contact.rows", "nav", "chatbot.qa",
 ];
 const getP = (o, p) => p.split(".").reduce((x, k) => (x == null ? x : x[k]), o);
 const setP = (o, p, v) => {
@@ -213,14 +231,33 @@ app.post(
   "/admin/upload",
   requireAuth,
   (req, res, next) => {
-    // CSRF via header so a forged request is rejected before any file is written.
+    if (!uploadLimiter(req.ip).ok) return res.status(429).json({ error: "Too many uploads just now. Give it a minute." });
+    // CSRF via header so a forged request is rejected before any file is read.
     if (!verifyCsrf(req.session, req.get("x-csrf-token"))) return res.status(403).json({ error: "bad csrf" });
-    next();
+    upload.single("image")(req, res, (err) => {
+      if (err) {
+        const tooBig = err.code === "LIMIT_FILE_SIZE";
+        return res.status(tooBig ? 413 : 400).json({ error: tooBig ? "Image too large (max 5MB)." : "Upload error." });
+      }
+      next();
+    });
   },
-  upload.single("image"),
-  (req, res) => {
-    if (!req.file) return res.status(400).json({ error: "no image (jpg, png, webp, gif or avif, max 5MB)" });
-    res.json({ url: "/img/uploads/" + req.file.filename });
+  async (req, res) => {
+    if (!req.file) return res.status(400).json({ error: "No image. Use jpg, png, webp, gif or avif, max 5MB." });
+    try {
+      // Re-encode to WebP: strips metadata, caps dimensions, keeps the file small
+      // so an uploaded image can never bloat the live site. Animated GIFs stay animated.
+      const animated = req.file.mimetype === "image/gif";
+      let pipeline = sharp(req.file.buffer, { animated, limitInputPixels: 50_000_000 });
+      if (!animated) pipeline = pipeline.rotate().resize({ width: 1920, height: 1920, fit: "inside", withoutEnlargement: true });
+      const out = await pipeline.webp({ quality: 80 }).toBuffer();
+      const name = crypto.randomUUID() + ".webp";
+      await writeFile(path.join(UPLOAD_DIR, name), out);
+      res.json({ url: "/img/uploads/" + name });
+    } catch (err) {
+      console.error("[upload] processing failed:", err.message);
+      res.status(400).json({ error: "Couldn't process that image. Try a different file." });
+    }
   }
 );
 
@@ -248,12 +285,23 @@ app.post("/api/chat", async (req, res) => {
     res.write(`data: ${JSON.stringify(data)}\n\n`);
   };
 
+  if (!chatLimiter(req.ip).ok) {
+    send("error", { message: "You're sending messages quite fast. Give it a moment and try again." });
+    return res.end();
+  }
+
   if (!anthropic) {
     send("error", { message: "Chat isn't configured on this server. Email info@heli145.com and we'll come back to you." });
     return res.end();
   }
 
   const apiMessages = messages.slice(-20).map(clientToApiMessage);
+
+  // Static prompt stays cached; the CMS-maintained FAQ rides as a second block
+  // (rebuilt each request so admin edits take effect immediately).
+  const system = [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }];
+  const faq = faqSystemBlock(loadContent().chatbot);
+  if (faq) system.push({ type: "text", text: faq });
 
   try {
     let turn = 0;
@@ -262,7 +310,7 @@ app.post("/api/chat", async (req, res) => {
       const stream = anthropic.messages.stream({
         model: MODEL,
         max_tokens: 1024,
-        system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
+        system,
         tools: TOOLS,
         messages: apiMessages,
       });
