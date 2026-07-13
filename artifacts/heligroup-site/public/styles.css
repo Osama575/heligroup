@@ -527,6 +527,31 @@ button { font-family: inherit; }
 }
 @media (max-width: 720px) { .hero-scroll { display: none; } .hero-marks { display: none; } }
 
+/* ---------- Interior page hero ---------- */
+
+.page-hero {
+  position: relative;
+  padding: clamp(96px, 12vw, 140px) 0 clamp(32px, 5vw, 64px);
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+}
+.page-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 130% at 100% 0%, var(--accent-soft), transparent 58%);
+  pointer-events: none;
+}
+.page-hero .container { position: relative; z-index: 1; }
+.page-hero-sub {
+  color: var(--ink-dim);
+  font-size: clamp(1.05rem, 0.98rem + 0.6vw, 1.25rem);
+  line-height: 1.55;
+  max-width: 56ch;
+  margin: 20px 0 0;
+}
+
 /* ---------- Section rhythm ---------- */
 
 .section { padding: clamp(88px, 10vw, 152px) 0; position: relative; z-index: 2; }
