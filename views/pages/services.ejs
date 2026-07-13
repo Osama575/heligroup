@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<%- include('../partials/head', { title: content.services.seoTitle, desc: content.services.seoDescription, content: content }) %>
+</head>
+<body>
+<%- include('../partials/header', { content: content, currentHref: '/services' }) %>
+
+<main id="main">
+
+  <section class="page-hero">
+    <div class="container">
+      <p class="kicker" data-reveal><span class="kicker-dot" aria-hidden="true"></span><%= content.services.hero.kicker %></p>
+      <h1 class="display-1" data-reveal><%= content.services.hero.heading %></h1>
+      <p class="page-hero-sub" data-reveal><%= content.services.hero.sub %></p>
+    </div>
+  </section>
+
+  <section class="section section--feature" id="heli145">
+    <div class="container">
+      <div class="feature">
+        <figure class="feature-media" data-reveal>
+          <img src="<%= content.services.maintenance.image %>" alt="<%= content.services.maintenance.imageAlt %>" loading="lazy" decoding="async" />
+          <span class="feature-code">145</span>
+        </figure>
+        <div class="feature-body" data-reveal>
+          <p class="pillar-tag"><%= content.services.maintenance.tag %></p>
+          <h2 class="display-2"><%= content.services.maintenance.title %></h2>
+          <p><%= content.services.maintenance.body %></p>
+          <button class="link-arrow" data-open-chat><%= content.services.maintenance.ctaLabel %> <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--index">
+    <div class="container">
+      <header class="section-head" data-reveal>
+        <h2 class="display-2">The wider support package.</h2>
+      </header>
+      <ul class="svc-index" data-reveal>
+        <% content.services.related.forEach(function (s) { %>
+          <li class="svc-row">
+            <span class="svc-no"><%= s.no %></span>
+            <div class="svc-text"><h3><%= s.title %></h3><p><%= s.body %></p></div>
+            <span class="svc-meta"><%= s.meta %></span>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--cta">
+    <div class="container cta-inner" data-reveal>
+      <h2 class="display-2">Not sure which service you need?</h2>
+      <p>Describe the aircraft and the task. The chat routes you to the right engineer.</p>
+      <div class="cta-actions">
+        <button class="btn btn--primary" data-open-chat>Talk to the team <span class="btn-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span></button>
+        <a class="btn btn--outline" href="/contact">Contact details</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<%- include('../partials/footer', { content: content }) %>
+<%- include('../partials/chat', { content: content }) %>
+<%- include('../partials/scripts') %>
+</body>
+</html>

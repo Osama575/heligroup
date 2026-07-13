@@ -1,0 +1,35 @@
+<!-- ===== CHAT WIDGET ===== -->
+<button id="chat-launcher" class="chat-launcher" aria-label="Open chat">
+  <span class="chat-launcher-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+  </span>
+  <span class="chat-launcher-label">Let's chat</span>
+</button>
+
+<section id="chat-panel" class="chat-panel" aria-live="polite" aria-hidden="true">
+  <header class="chat-header">
+    <div class="chat-title">
+      <span class="chat-status"></span>
+      <div>
+        <strong>Chat with <%= content.site.name %></strong>
+        <small>We usually reply instantly</small>
+      </div>
+    </div>
+    <button id="chat-close" class="chat-close" aria-label="Close chat">×</button>
+  </header>
+  <div id="chat-log" class="chat-log" role="log"></div>
+  <div class="chat-suggestions" id="chat-suggestions">
+    <button class="chip" data-prompt="What aircraft types do you support?">Aircraft we support</button>
+    <button class="chip" data-prompt="What's the difference between HELI145 and HELI147?">HELI145 vs HELI147</button>
+    <button class="chip" data-prompt="Where are you based?">Where you're based</button>
+    <button class="chip" data-prompt="How do I book a Part 147 course?">Book a course</button>
+  </div>
+  <form id="chat-form" class="chat-form" autocomplete="off">
+    <input id="chat-input" type="text" placeholder="Ask about maintenance, courses, approvals…" aria-label="Your message" maxlength="500" />
+    <button type="submit" aria-label="Send">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </button>
+  </form>
+</section>

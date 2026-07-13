@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<%- include('../partials/head', { title: content.contact.seoTitle, desc: content.contact.seoDescription, content: content }) %>
+</head>
+<body>
+<%- include('../partials/header', { content: content, currentHref: '/contact' }) %>
+
+<main id="main">
+
+  <section class="page-hero">
+    <div class="container">
+      <p class="kicker" data-reveal><span class="kicker-dot" aria-hidden="true"></span><%= content.contact.hero.kicker %></p>
+      <h1 class="display-1" data-reveal><%= content.contact.hero.heading %></h1>
+    </div>
+  </section>
+
+  <section class="section section--contact" id="contact">
+    <div class="container contact-grid">
+      <div class="contact-lead" data-reveal>
+        <p class="contact-sub"><%= content.contact.hero.sub %></p>
+        <div class="contact-cta">
+          <button class="btn btn--primary" data-open-chat>
+            Start a chat
+            <span class="btn-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="contact-detail" data-reveal>
+        <% content.contact.rows.forEach(function (row) { %>
+          <div class="contact-row">
+            <span class="contact-key"><%= row.key %></span>
+            <a href="mailto:<%= row.email %>"><%= row.email %></a>
+          </div>
+        <% }); %>
+        <address class="contact-address">
+          <% content.site.address.forEach(function (line, i) { %><%= line %><% if (i < content.site.address.length - 1) { %><br /><% } %><% }); %>
+        </address>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<%- include('../partials/footer', { content: content }) %>
+<%- include('../partials/chat', { content: content }) %>
+<%- include('../partials/scripts') %>
+</body>
+</html>

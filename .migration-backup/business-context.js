@@ -76,6 +76,34 @@ positioning is part of their pitch.
   operator. They are a maintenance + training organisation only.
 `.trim();
 
+// Builds an extra system block from the CMS-maintained FAQ (content.chatbot).
+// Returned as a SECOND system block so the big static SYSTEM_PROMPT above stays
+// cacheable and only this small block changes when an admin edits the Q&A.
+// Returns null when there's nothing to add.
+export function faqSystemBlock(chatbot) {
+  const intro = String(chatbot?.intro ?? "").trim();
+  const qa = Array.isArray(chatbot?.qa)
+    ? chatbot.qa.filter((x) => x && String(x.q).trim() && String(x.a).trim())
+    : [];
+  if (!intro && !qa.length) return null;
+
+  const lines = [
+    "# THEHELIGROUP FAQ — maintained by the team (authoritative)",
+    "",
+    "These answers are kept current by THEHELIGROUP staff in their CMS. Treat them as the",
+    "source of truth for the facts they cover: when a visitor's question matches one, base",
+    "your answer on it and do not contradict it. If something isn't covered here, fall back",
+    "to the knowledge base and your normal rules. Keep your own voice — paraphrase naturally",
+    "rather than reading an answer out verbatim when that fits the conversation better.",
+  ];
+  if (intro) lines.push("", intro);
+  lines.push("");
+  for (const { q, a } of qa) {
+    lines.push(`Q: ${String(q).trim()}`, `A: ${String(a).trim()}`, "");
+  }
+  return lines.join("\n").trim();
+}
+
 // AOG fast-lane phone numbers are read from env so they can rotate without a redeploy.
 const AOG_PHONE = process.env.AOG_PHONE || "+44 1603 000000";
 const AOG_WHATSAPP = process.env.AOG_WHATSAPP || "+44 7000 000000";

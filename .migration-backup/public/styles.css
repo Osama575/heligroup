@@ -68,7 +68,7 @@
   --line-strong: oklch(0.30 0.04 256 / 0.26);
   --ink: oklch(0.27 0.04 256);
   --ink-dim: oklch(0.44 0.03 256);
-  --ink-muted: oklch(0.54 0.028 256);
+  --ink-muted: oklch(0.50 0.03 256);
   --accent: oklch(0.55 0.21 25);
   --accent-strong: oklch(0.53 0.21 25);
   --accent-ink: oklch(0.99 0 0);
@@ -252,7 +252,8 @@ button { font-family: inherit; }
   transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease),
     backdrop-filter 0.3s var(--ease);
 }
-.site-header.is-scrolled {
+.site-header.is-scrolled,
+.site-header.is-solid {
   --hdr-fg: var(--ink);
   --hdr-fg-dim: var(--ink-dim);
   --hdr-line: var(--line);
@@ -306,7 +307,9 @@ button { font-family: inherit; }
 .nav a:hover,
 .nav a.active { color: var(--hdr-fg); background: oklch(0.5 0 0 / 0.10); }
 .is-scrolled .nav a:hover,
-.is-scrolled .nav a.active { background: var(--accent-soft); color: var(--accent); }
+.is-scrolled .nav a.active,
+.is-solid .nav a:hover,
+.is-solid .nav a.active { background: var(--accent-soft); color: var(--accent); }
 
 .caret { font-size: 0.6em; opacity: 0.7; }
 
@@ -670,7 +673,7 @@ button { font-family: inherit; }
   transition: transform 0.25s var(--ease-out), background-color 0.25s var(--ease);
 }
 .svc-no { font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent); letter-spacing: 0.1em; }
-.svc-text h4 {
+.svc-text h3 {
   font-family: var(--font-display);
   font-weight: 600;
   font-size: clamp(1.15rem, 1rem + 0.7vw, 1.5rem);
@@ -702,7 +705,7 @@ button { font-family: inherit; }
 }
 .fleet-card--featured { grid-column: span 2; }
 .fleet-photo {
-  aspect-ratio: 4 / 3;
+  height: clamp(190px, 20vw, 280px);
   background:
     var(--photo) center/cover no-repeat,
     url("/img/heli-silhouette.svg") center/52% no-repeat,
@@ -1171,3 +1174,115 @@ html.js .why-item:nth-child(3) { transition-delay: 0.18s; }
     scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================
+   Multipage additions: page hero, feature split, CTA, outline btn
+   ============================================================ */
+
+.display-1 {
+  font-size: clamp(2.4rem, 1.5rem + 3.2vw, 4rem);
+  line-height: 1.02;
+}
+
+/* Interior page hero (compact header band) */
+.page-hero {
+  position: relative;
+  padding: clamp(122px, 15vw, 172px) 0 clamp(40px, 6vw, 76px);
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+}
+.page-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 130% at 100% 0%, var(--accent-soft), transparent 58%);
+  pointer-events: none;
+}
+.page-hero .container { position: relative; z-index: 1; }
+.page-hero-sub {
+  color: var(--ink-dim);
+  font-size: clamp(1.05rem, 0.98rem + 0.6vw, 1.25rem);
+  line-height: 1.55;
+  max-width: 56ch;
+  margin: 20px 0 0;
+}
+
+/* Feature split (services / training) */
+.section--feature { background: var(--bg); }
+.section--index { background: var(--bg-2); border-top: 1px solid var(--line); }
+
+.feature {
+  display: grid;
+  grid-template-columns: 1.02fr 0.98fr;
+  gap: clamp(28px, 5vw, 72px);
+  align-items: center;
+}
+.feature--reverse .feature-media { order: 2; }
+.feature-media {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.feature-media img { width: 100%; height: 100%; object-fit: cover; }
+.feature-code {
+  position: absolute;
+  right: 22px; bottom: 14px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(3rem, 6vw, 5.2rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: oklch(1 0 0 / 0.18);
+}
+.feature-body .pillar-tag { margin-bottom: 12px; }
+.feature-body .display-2 { margin-bottom: 16px; }
+.feature-body p { color: var(--ink-dim); max-width: 48ch; margin: 0; }
+.feature-body .link-arrow { margin-top: 22px; }
+
+/* CTA band */
+.section--cta { background: var(--bg-2); border-top: 1px solid var(--line); text-align: center; }
+.cta-inner { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.cta-inner .display-2 { max-width: 22ch; }
+.cta-inner p { color: var(--ink-dim); margin: 0; max-width: 50ch; }
+.cta-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+
+/* Outline button (theme-aware secondary, for use off the hero) */
+.btn--outline { background: transparent; border-color: var(--line-strong); color: var(--ink); }
+@media (hover: hover) and (pointer: fine) {
+  .btn--outline:hover { border-color: var(--ink); background: var(--surface); transform: translateY(-2px); }
+}
+
+@media (max-width: 860px) {
+  .feature { grid-template-columns: 1fr; gap: 28px; }
+  .feature--reverse .feature-media { order: 0; }
+}
+
+/* Training index rendered as a 2-up card grid so it doesn't clone the services
+   hairline list (layout-family variance across pages). */
+.svc-index--cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(14px, 2vw, 20px);
+  border-top: 0;
+}
+.svc-index--cards .svc-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  padding: clamp(20px, 2.4vw, 28px);
+}
+.svc-index--cards .svc-no { color: var(--accent); }
+.svc-index--cards .svc-meta { margin-top: 6px; }
+@media (hover: hover) and (pointer: fine) {
+  .svc-index--cards .svc-row:hover { background: var(--accent-soft); transform: translateY(-3px); }
+}
+@media (max-width: 640px) { .svc-index--cards { grid-template-columns: 1fr; } }

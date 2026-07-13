@@ -47,3 +47,6 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# CMS runtime uploads (kept out of source; created at runtime)
+public/img/uploads/

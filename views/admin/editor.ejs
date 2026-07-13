@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit site — THEHELIGROUP CMS</title>
+  <meta name="robots" content="noindex" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem("hg-theme") || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", t);
+      } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+      document.documentElement.classList.add("js");
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/admin.css" />
+</head>
+<%
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const text = (name, label, val, hint) => `<label class="ed-field"><span>${esc(label)}${hint ? `<em>${esc(hint)}</em>` : ""}</span><input type="text" name="${name}" value="${esc(val)}" /></label>`;
+  const area = (name, label, val, rows) => `<label class="ed-field ed-field--area"><span>${esc(label)}</span><textarea name="${name}" rows="${rows || 3}">${esc(val)}</textarea></label>`;
+  const image = (name, label, val) => `<div class="ed-field ed-img"><span>${esc(label)}</span><div class="ed-img-row"><input type="text" name="${name}" value="${esc(val)}" data-img-input /><button type="button" class="ed-upload" data-upload>Upload</button></div><div class="ed-img-prev"${val ? "" : " hidden"}><img src="${esc(val)}" alt="" /></div></div>`;
+
+  const arrayEditor = (base, items, spec) => {
+    const fieldHtml = (i, item) => spec.map((f) => {
+      const name = f.field ? `${base}[${i}][${f.field}]` : `${base}[${i}]`;
+      const val = f.field ? (item ? item[f.field] : "") : (item == null ? "" : item);
+      const df = `data-field="${esc(f.field)}"`;
+      if (f.type === "area") return `<label class="ed-field ed-field--area"><span>${esc(f.label)}</span><textarea name="${name}" ${df} rows="2">${esc(val)}</textarea></label>`;
+      if (f.type === "bool") return `<label class="ed-check"><input type="checkbox" name="${name}" ${df} value="true" ${val ? "checked" : ""} /><span>${esc(f.label)}</span></label>`;
+      if (f.type === "img") return `<div class="ed-field ed-img"><span>${esc(f.label)}</span><div class="ed-img-row"><input type="text" name="${name}" ${df} value="${esc(val)}" data-img-input /><button type="button" class="ed-upload" data-upload>Upload</button></div><div class="ed-img-prev"${val ? "" : " hidden"}><img src="${esc(val)}" alt="" /></div></div>`;
+      return `<label class="ed-field"><span>${esc(f.label)}</span><input type="text" name="${name}" ${df} value="${esc(val)}" /></label>`;
+    }).join("");
+    const item = (i, it) => `<div class="ed-item" data-item><div class="ed-item-fields">${fieldHtml(i, it)}</div><button type="button" class="ed-remove" data-remove aria-label="Remove item">Remove</button></div>`;
+    const rows = (items || []).map((it, i) => item(i, it)).join("");
+    const tpl = `<template data-tpl>${item("__i__", null)}</template>`;
+    return `<div class="ed-array" data-array data-base="${esc(base)}">${rows}${tpl}<button type="button" class="ed-add" data-add>+ Add item</button></div>`;
+  };
+%>
+<body class="admin-body">
+
+  <header class="admin-top">
+    <div class="admin-brand"><span class="logo-mark">THE</span><span class="logo-mark logo-mark--accent">HELI</span><span class="logo-mark">GROUP</span> <span class="login-cms">CMS</span></div>
+    <div class="admin-actions">
+      <a class="admin-link" href="/" target="_blank" rel="noopener">View site ↗</a>
+      <button class="btn btn--primary btn--sm" type="submit" form="ed-form">Save changes</button>
+      <form method="POST" action="/admin/logout" class="admin-logout"><input type="hidden" name="_csrf" value="<%= csrf %>" /><button class="admin-link" type="submit">Log out</button></form>
+    </div>
+  </header>
+
+  <div class="admin-shell">
+    <div class="admin-tabs" role="tablist" aria-label="Sections">
+      <button type="button" class="admin-tab" role="tab" data-tab="s-site">Site &amp; contact</button>
+      <button type="button" class="admin-tab" role="tab" data-tab="s-home">Home</button>
+      <button type="button" class="admin-tab" role="tab" data-tab="s-services">Services</button>
+      <button type="button" class="admin-tab" role="tab" data-tab="s-training">Training</button>
+      <button type="button" class="admin-tab" role="tab" data-tab="s-fleet">Fleet</button>
+      <button type="button" class="admin-tab" role="tab" data-tab="s-contact">Contact page</button>
+      <button type="button" class="admin-tab" role="tab" data-tab="s-chatbot">Chatbot</button>
+    </div>
+
+    <form id="ed-form" method="POST" action="/admin/save" class="admin-form">
+      <input type="hidden" name="_csrf" value="<%= csrf %>" />
+      <input type="hidden" name="_full" value="1" />
+
+      <!-- SITE -->
+      <section class="ed-section" id="s-site">
+        <h2>Site &amp; contact</h2>
+        <div class="ed-grid-2">
+          <%- text("site[name]", "Business name", content.site.name) %>
+          <%- text("site[coords]", "Coordinates line", content.site.coords) %>
+          <%- text("site[email145]", "Maintenance email", content.site.email145) %>
+          <%- text("site[email147]", "Training email", content.site.email147) %>
+        </div>
+        <%- area("site[tagline]", "Footer tagline", content.site.tagline, 2) %>
+        <%- text("site[ownerEmail]", "Owner email (visit notifications)", content.site.ownerEmail, "where 'new visit' emails go") %>
+        <h3>Address lines</h3>
+        <%- arrayEditor("site[address]", content.site.address, [{ field: "", label: "Line", type: "text" }]) %>
+        <h3>Navigation labels</h3>
+        <div class="ed-nav">
+          <% content.nav.forEach(function (n, i) { %>
+            <label class="ed-field ed-field--inline"><span>#<%= i + 1 %></span><input type="text" name="nav[<%= i %>][label]" value="<%= n.label %>" /><input type="hidden" name="nav[<%= i %>][href]" value="<%= n.href %>" /></label>
+          <% }); %>
+        </div>
+      </section>
+
+      <!-- HOME -->
+      <section class="ed-section" id="s-home">
+        <h2>Home page</h2>
+        <%- text("home[seoTitle]", "SEO title", content.home.seoTitle) %>
+        <%- area("home[seoDescription]", "SEO description", content.home.seoDescription, 2) %>
+
+        <h3>Hero</h3>
+        <%- text("home[hero][kicker]", "Kicker", content.home.hero.kicker) %>
+        <%- area("home[hero][heading]", "Heading", content.home.hero.heading, 2) %>
+        <%- area("home[hero][sub]", "Sub-text", content.home.hero.sub, 2) %>
+        <div class="ed-grid-2">
+          <%- text("home[hero][primaryCtaLabel]", "Primary button label", content.home.hero.primaryCtaLabel) %>
+          <%- text("home[hero][secondaryCtaLabel]", "Secondary button label", content.home.hero.secondaryCtaLabel) %>
+          <%- text("home[hero][secondaryCtaHref]", "Secondary button link", content.home.hero.secondaryCtaHref) %>
+          <%- text("home[hero][imageAlt]", "Hero image alt text", content.home.hero.imageAlt) %>
+        </div>
+        <%- image("home[hero][image]", "Hero image", content.home.hero.image) %>
+        <h3>Approval marks (hero)</h3>
+        <%- arrayEditor("home[marks]", content.home.marks, [{ field: "", label: "Mark", type: "text" }]) %>
+
+        <h3>About block</h3>
+        <%- text("home[about][kicker]", "Kicker", content.home.about.kicker) %>
+        <%- area("home[about][heading]", "Heading", content.home.about.heading, 2) %>
+        <div class="ed-grid-2"><%- image("home[about][image]", "Photo", content.home.about.image) %><%- text("home[about][imageAlt]", "Photo alt text", content.home.about.imageAlt) %></div>
+        <h4>Paragraphs</h4>
+        <%- arrayEditor("home[about][body]", content.home.about.body, [{ field: "", label: "Paragraph", type: "area" }]) %>
+        <h4>Figures</h4>
+        <%- arrayEditor("home[about][figures]", content.home.about.figures, [{ field: "num", label: "Number", type: "text" }, { field: "label", label: "Label", type: "text" }]) %>
+
+        <h3>Why block</h3>
+        <%- area("home[why][heading]", "Heading", content.home.why.heading, 2) %>
+        <%- arrayEditor("home[why][items]", content.home.why.items, [{ field: "title", label: "Title", type: "text" }, { field: "body", label: "Body", type: "area" }]) %>
+
+        <h3>Testimonial</h3>
+        <%- area("home[quote][text]", "Quote", content.home.quote.text, 3) %>
+        <div class="ed-grid-2"><%- text("home[quote][cite]", "Attribution", content.home.quote.cite) %><%- text("home[quote][meta]", "Attribution detail", content.home.quote.meta) %></div>
+
+        <h3>Trusted strip</h3>
+        <%- text("home[trustedTitle]", "Heading", content.home.trustedTitle) %>
+        <%- arrayEditor("home[trustedMarks]", content.home.trustedMarks, [{ field: "", label: "Mark", type: "text" }]) %>
+      </section>
+
+      <!-- SERVICES -->
+      <section class="ed-section" id="s-services">
+        <h2>Services page</h2>
+        <%- text("services[seoTitle]", "SEO title", content.services.seoTitle) %>
+        <%- area("services[seoDescription]", "SEO description", content.services.seoDescription, 2) %>
+        <h3>Header</h3>
+        <%- text("services[hero][kicker]", "Kicker", content.services.hero.kicker) %>
+        <%- area("services[hero][heading]", "Heading", content.services.hero.heading, 2) %>
+        <%- area("services[hero][sub]", "Sub-text", content.services.hero.sub, 2) %>
+        <h3>Maintenance feature (HELI145)</h3>
+        <div class="ed-grid-2">
+          <%- text("services[maintenance][tag]", "Tag", content.services.maintenance.tag) %>
+          <%- text("services[maintenance][title]", "Title", content.services.maintenance.title) %>
+          <%- text("services[maintenance][ctaLabel]", "Button label", content.services.maintenance.ctaLabel) %>
+          <%- text("services[maintenance][imageAlt]", "Image alt text", content.services.maintenance.imageAlt) %>
+        </div>
+        <%- area("services[maintenance][body]", "Body", content.services.maintenance.body, 3) %>
+        <%- image("services[maintenance][image]", "Image", content.services.maintenance.image) %>
+        <h3>Related services</h3>
+        <%- arrayEditor("services[related]", content.services.related, [{ field: "no", label: "No.", type: "text" }, { field: "title", label: "Title", type: "text" }, { field: "body", label: "Body", type: "area" }, { field: "meta", label: "Meta", type: "text" }]) %>
+      </section>
+
+      <!-- TRAINING -->
+      <section class="ed-section" id="s-training">
+        <h2>Training page</h2>
+        <%- text("training[seoTitle]", "SEO title", content.training.seoTitle) %>
+        <%- area("training[seoDescription]", "SEO description", content.training.seoDescription, 2) %>
+        <h3>Header</h3>
+        <%- text("training[hero][kicker]", "Kicker", content.training.hero.kicker) %>
+        <%- area("training[hero][heading]", "Heading", content.training.hero.heading, 2) %>
+        <%- area("training[hero][sub]", "Sub-text", content.training.hero.sub, 2) %>
+        <h3>Training feature (HELI147)</h3>
+        <div class="ed-grid-2">
+          <%- text("training[pillar][tag]", "Tag", content.training.pillar.tag) %>
+          <%- text("training[pillar][title]", "Title", content.training.pillar.title) %>
+          <%- text("training[pillar][ctaLabel]", "Button label", content.training.pillar.ctaLabel) %>
+          <%- text("training[pillar][imageAlt]", "Image alt text", content.training.pillar.imageAlt) %>
+        </div>
+        <%- area("training[pillar][body]", "Body", content.training.pillar.body, 3) %>
+        <%- image("training[pillar][image]", "Image", content.training.pillar.image) %>
+        <h3>Training points</h3>
+        <%- arrayEditor("training[points]", content.training.points, [{ field: "no", label: "No.", type: "text" }, { field: "title", label: "Title", type: "text" }, { field: "body", label: "Body", type: "area" }, { field: "meta", label: "Meta", type: "text" }]) %>
+      </section>
+
+      <!-- FLEET -->
+      <section class="ed-section" id="s-fleet">
+        <h2>Fleet page</h2>
+        <%- text("fleet[seoTitle]", "SEO title", content.fleet.seoTitle) %>
+        <%- area("fleet[seoDescription]", "SEO description", content.fleet.seoDescription, 2) %>
+        <h3>Header</h3>
+        <%- text("fleet[hero][kicker]", "Kicker", content.fleet.hero.kicker) %>
+        <%- area("fleet[hero][heading]", "Heading", content.fleet.hero.heading, 2) %>
+        <%- area("fleet[hero][sub]", "Sub-text", content.fleet.hero.sub, 2) %>
+        <h3>Aircraft types</h3>
+        <%- arrayEditor("fleet[types]", content.fleet.types, [{ field: "make", label: "Make", type: "text" }, { field: "model", label: "Model", type: "text" }, { field: "note", label: "Note (optional)", type: "area" }, { field: "image", label: "Image", type: "img" }, { field: "featured", label: "Featured (larger tile)", type: "bool" }]) %>
+      </section>
+
+      <!-- CONTACT -->
+      <section class="ed-section" id="s-contact">
+        <h2>Contact page</h2>
+        <%- text("contact[seoTitle]", "SEO title", content.contact.seoTitle) %>
+        <%- area("contact[seoDescription]", "SEO description", content.contact.seoDescription, 2) %>
+        <h3>Header</h3>
+        <%- text("contact[hero][kicker]", "Kicker", content.contact.hero.kicker) %>
+        <%- area("contact[hero][heading]", "Heading", content.contact.hero.heading, 2) %>
+        <%- area("contact[hero][sub]", "Sub-text", content.contact.hero.sub, 2) %>
+        <h3>Contact rows</h3>
+        <%- arrayEditor("contact[rows]", content.contact.rows, [{ field: "key", label: "Label", type: "text" }, { field: "email", label: "Email", type: "text" }]) %>
+      </section>
+
+      <!-- CHATBOT -->
+      <section class="ed-section" id="s-chatbot">
+        <h2>Chatbot knowledge</h2>
+        <p class="ed-note">The site assistant treats these Q&amp;A pairs as the source of truth. Add the questions visitors actually ask and the answers you want given. Edits apply to new chats straight away.</p>
+        <%- area("chatbot[intro]", "Extra context (optional)", content.chatbot && content.chatbot.intro, 3) %>
+        <h3>Questions &amp; answers</h3>
+        <%- arrayEditor("chatbot[qa]", content.chatbot && content.chatbot.qa, [{ field: "q", label: "Question", type: "text" }, { field: "a", label: "Answer", type: "area" }]) %>
+      </section>
+
+      <div class="admin-save-bar">
+        <button class="btn btn--primary" type="submit">Save changes</button>
+      </div>
+    </form>
+  </div>
+
+  <% if (typeof saved !== "undefined" && saved) { %><div class="toast" data-toast>Saved. <a href="/" target="_blank" rel="noopener">View site ↗</a></div><% } %>
+  <% if (typeof err !== "undefined" && err) { %><div class="toast toast--error" data-toast>Couldn't save: <%= err %></div><% } %>
+
+  <script src="/admin.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="logo logo--footer" aria-label="<%= content.site.name %> home">
+        <span class="logo-mark">THE</span><span class="logo-mark logo-mark--accent">HELI</span><span class="logo-mark">GROUP</span>
+      </a>
+      <p class="footer-tag"><%= content.site.tagline %></p>
+    </div>
+    <nav class="footer-nav" aria-label="Footer">
+      <% content.nav.forEach(function (item) { %>
+        <a href="<%= item.href %>"><%= item.label %></a>
+      <% }); %>
+    </nav>
+    <div class="footer-marks">
+      <span>UK CAA</span><span>EASA</span><span>BHA</span><span>BBGA</span>
+    </div>
+  </div>
+  <div class="footer-base container">
+    <span>© <%= new Date().getFullYear() %> <%= content.site.name %> LTD</span>
+    <span class="footer-coords"><%= content.site.coords %></span>
+  </div>
+</footer>
