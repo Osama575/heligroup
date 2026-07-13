@@ -121,20 +121,41 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
 }
 
 buildAll()
-  .then(() =>
-    Promise.all([
-      cp(
-        path.resolve(artifactDir, "public"),
-        path.resolve(artifactDir, "dist", "public"),
-        { recursive: true },
-      ),
+  .then(async () => {
+    const sitePublic = path.resolve(artifactDir, "..", "heligroup-site", "public");
+    const serverPublic = path.resolve(artifactDir, "public");
+    const distPublic = path.resolve(artifactDir, "dist", "public");
+
+    // Sync frontend assets from the source of truth (heligroup-site) into
+    // api-server/public so the two stay in lock-step.
+    const { readdir } = await import("node:fs/promises");
+    let synced = [];
+    try {
+      const files = await readdir(sitePublic);
+      for (const f of files) {
+        // Skip index.html — the EJS templates handle page rendering.
+        if (f === "index.html") continue;
+        await cp(path.join(sitePublic, f), path.join(serverPublic, f), { recursive: true });
+        synced.push(f);
+      }
+    } catch {
+      // heligroup-site may not exist in some environments — skip silently.
+    }
+
+    // Copy the assembled public/ + views/ into dist.
+    await Promise.all([
+      cp(serverPublic, distPublic, { recursive: true }),
       cp(
         path.resolve(artifactDir, "..", "..", "views"),
         path.resolve(artifactDir, "dist", "views"),
         { recursive: true },
       ),
-    ]),
-  )
+    ]);
+
+    if (synced.length) {
+      console.log(`[build] synced from heligroup-site: ${synced.join(", ")}`);
+    }
+  })
   .catch((err) => {
     console.error(err);
     process.exit(1);

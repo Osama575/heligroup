@@ -6,6 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import router from "./routes/index.js";
 import adminRouter from "./routes/admin.js";
+import pageRouter from "./routes/pages.js";
 import { logger } from "./lib/logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -55,9 +56,7 @@ const publicDir = isDist
 
 app.use(express.static(publicDir));
 
-app.get("/{*path}", (req, res, next) => {
-  if (req.path.startsWith("/admin") || req.path.startsWith("/api")) return next();
-  res.sendFile(path.join(publicDir, "index.html"));
-});
+// ── Page routes (EJS-rendered from content.json) ─────────────────────────────
+app.use(pageRouter);
 
 export default app;
