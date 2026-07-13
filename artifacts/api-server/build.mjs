@@ -122,11 +122,18 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
 
 buildAll()
   .then(() =>
-    cp(
-      path.resolve(artifactDir, "public"),
-      path.resolve(artifactDir, "dist", "public"),
-      { recursive: true },
-    ),
+    Promise.all([
+      cp(
+        path.resolve(artifactDir, "public"),
+        path.resolve(artifactDir, "dist", "public"),
+        { recursive: true },
+      ),
+      cp(
+        path.resolve(artifactDir, "..", "..", "views"),
+        path.resolve(artifactDir, "dist", "views"),
+        { recursive: true },
+      ),
+    ]),
   )
   .catch((err) => {
     console.error(err);

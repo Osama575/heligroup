@@ -50,3 +50,11 @@ Thumbs.db
 
 # CMS runtime uploads (kept out of source; created at runtime)
 public/img/uploads/
+
+# Environment secrets — never commit
+.env
+.env.local
+.env.*.local
+
+# Google service-account key (contains private key)
+google-sa-key.json

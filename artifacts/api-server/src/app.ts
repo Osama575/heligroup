@@ -1,12 +1,15 @@
 import express, { type Express } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
 import path from "path";
 import { fileURLToPath } from "url";
 import router from "./routes/index.js";
+import adminRouter from "./routes/admin.js";
 import { logger } from "./lib/logger.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const isDist = __dirname.endsWith("/dist") || __dirname.endsWith("\\dist");
 
 const app: Express = express();
 
@@ -32,20 +35,28 @@ app.use(
 app.use(cors());
 app.use(express.json({ limit: "256kb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
+// ── EJS view engine for admin CMS ───────────────────────────────────────────
+app.set("view engine", "ejs");
+const viewsDir = path.join(__dirname, "..", "..", "..", "views");
+app.set("views", viewsDir);
+
+// ── API routes ───────────────────────────────────────────────────────────────
 app.use("/api", router);
 
+// ── Admin CMS routes (mounted at /admin) ────────────────────────────────────
+app.use("/admin", adminRouter);
+
 // Serve the static frontend.
-// In dev: __dirname = artifacts/api-server/src → public is ../public
-// In production (esbuild): __dirname = artifacts/api-server/dist → public is ./public
-const isDist = __dirname.endsWith("/dist") || __dirname.endsWith("\\dist");
 const publicDir = isDist
   ? path.join(__dirname, "public")
   : path.join(__dirname, "..", "public");
 
 app.use(express.static(publicDir));
 
-app.get("/{*path}", (_req, res) => {
+app.get("/{*path}", (req, res, next) => {
+  if (req.path.startsWith("/admin") || req.path.startsWith("/api")) return next();
   res.sendFile(path.join(publicDir, "index.html"));
 });
 
