@@ -1,3 +1,33 @@
+import { readFileSync } from "fs";
+import path from "path";
+
+function findWorkspaceRoot(startDir: string): string {
+  let dir = startDir;
+  while (true) {
+    try {
+      const stat = require("fs").statSync(path.join(dir, "pnpm-workspace.yaml"));
+      if (stat) return dir;
+    } catch {}
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return path.resolve(startDir, "..");
+}
+
+const ROOT = findWorkspaceRoot(process.cwd());
+const CONTENT_PATH = path.join(ROOT, "content", "content.json");
+
+function loadChatContent(): { intro: string; qa: { q: string; a: string }[] } {
+  try {
+    const raw = readFileSync(CONTENT_PATH, "utf8");
+    const content = JSON.parse(raw);
+    return content.chatbot || { intro: "", qa: [] };
+  } catch {
+    return { intro: "", qa: [] };
+  }
+}
+
 export const BUSINESS_NAME = "THEHELIGROUP";
 
 export const BUSINESS_CONTEXT = `
@@ -75,7 +105,22 @@ positioning is part of their pitch.
 const AOG_PHONE = process.env["AOG_PHONE"] || "+44 1603 000000";
 const AOG_WHATSAPP = process.env["AOG_WHATSAPP"] || "+44 7000 000000";
 
-export const SYSTEM_PROMPT = `
+function buildCmsKnowledge(): string {
+  const chat = loadChatContent();
+  const lines: string[] = [];
+  if (chat.intro) lines.push(chat.intro);
+  if (chat.qa.length) {
+    lines.push("");
+    lines.push("## Frequently asked questions (from the team)");
+    for (const { q, a } of chat.qa) {
+      lines.push(`- **${q}** ${a}`);
+    }
+  }
+  return lines.join("\n");
+}
+
+export function getSystemPrompt(): string {
+  return `
 You are the web chat assistant for ${BUSINESS_NAME}, a UK helicopter maintenance and
 training group based at Norwich International Airport. You speak the way a sharp,
 calm business manager speaks to a prospective client: warm, brief, professional,
@@ -139,7 +184,7 @@ types on the schedule:
 
 If the visitor names anything else (Bell, Robinson R44/R66, EC120, MD500, etc.):
 say plainly that the type isn't on the current approval list, but you can take
-their details right here and the team will come back to them on whether they can
+their details right here and the team will come back to you on whether they can
 assist or point them to the right organisation. Then ask for the details YOURSELF
 across the next 1–2 turns:
   - Aircraft type, registration prefix, and inspection due (or specific defect)
@@ -312,5 +357,11 @@ booking confirmations; always go through the tools.
 
 === KNOWLEDGE BASE ===
 ${BUSINESS_CONTEXT}
+
+${buildCmsKnowledge()}
 === END KNOWLEDGE BASE ===
 `.trim();
+}
+
+// Keep a static export for backward compat
+export const SYSTEM_PROMPT = getSystemPrompt();
