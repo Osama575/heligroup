@@ -40,7 +40,9 @@ app.use(cookieParser());
 
 // ── EJS view engine for admin CMS ───────────────────────────────────────────
 app.set("view engine", "ejs");
-const viewsDir = path.join(__dirname, "..", "..", "..", "views");
+const viewsDir = isDist
+  ? path.join(__dirname, "views")
+  : path.join(__dirname, "..", "..", "..", "views");
 app.set("views", viewsDir);
 
 // ── API routes ───────────────────────────────────────────────────────────────

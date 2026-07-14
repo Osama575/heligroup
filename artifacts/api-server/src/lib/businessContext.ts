@@ -1,22 +1,22 @@
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import path from "path";
 
-function findWorkspaceRoot(startDir: string): string {
-  let dir = startDir;
-  while (true) {
-    try {
-      const stat = require("fs").statSync(path.join(dir, "pnpm-workspace.yaml"));
-      if (stat) return dir;
-    } catch {}
-    const parent = path.dirname(dir);
-    if (parent === dir) break;
-    dir = parent;
+function resolveContentPath(): string {
+  const candidates = [
+    // Production: content/ relative to the deployment root (parent of dist/)
+    path.join(process.cwd(), "content", "content.json"),
+    // Development: workspace root
+    path.join(process.cwd(), "..", "..", "content", "content.json"),
+    // Fallback: try walking up from cwd
+    path.resolve(process.cwd(), "..", "content", "content.json"),
+  ];
+  for (const p of candidates) {
+    if (existsSync(p)) return p;
   }
-  return path.resolve(startDir, "..");
+  return candidates[0];
 }
 
-const ROOT = findWorkspaceRoot(process.cwd());
-const CONTENT_PATH = path.join(ROOT, "content", "content.json");
+const CONTENT_PATH = resolveContentPath();
 
 function loadChatContent(): { intro: string; qa: { q: string; a: string }[] } {
   try {

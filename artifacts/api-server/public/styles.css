@@ -334,6 +334,16 @@ button {
   color: var(--accent);
 }
 
+.logo-img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+.footer-brand .logo-img {
+  height: 28px;
+}
+
 .nav ul {
   list-style: none;
   margin: 0;
