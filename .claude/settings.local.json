@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:theheligroup.com)",
-      "WebSearch"
+      "WebSearch",
+      "PowerShell(\"=== status ===\")",
+      "PowerShell(git ls-files | Where-Object { $_ -notmatch 'node_modules|package-lock' })"
     ]
   }
 }
