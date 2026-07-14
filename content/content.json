@@ -1,17 +1,17 @@
 {
   "site": {
     "name": "THEHELIGROUP",
-    "coords": "52.6758°N · 1.2827°E",
+    "tagline": "Independent helicopter maintenance and training. Norwich, UK.",
     "email145": "info@heli145.com",
     "email147": "info@heli147.com",
-    "tagline": "Independent helicopter maintenance and training. Norwich, UK.",
-    "ownerEmail": "foresightagencies@gmail.com",
+    "coords": "52.6758°N · 1.2827°E",
     "address": [
       "THEHELIGROUP LTD",
       "Business Aviation Centre",
       "Norwich International Airport",
       "Norwich, Norfolk, NR6 6JT, United Kingdom"
-    ]
+    ],
+    "ownerEmail": "foresightagencies@gmail.com"
   },
   "nav": [
     {
@@ -45,8 +45,8 @@
       "primaryCtaLabel": "Talk to the team",
       "secondaryCtaLabel": "Aircraft we support",
       "secondaryCtaHref": "/fleet",
-      "imageAlt": "Twin-engine helicopters in formation against an overcast sky",
-      "image": "/img/uploads/97e545c9-6962-4573-824a-d5014d641952.webp"
+      "image": "/img/future-airbus-military-helicopters.jpg",
+      "imageAlt": "Twin-engine helicopters in formation against an overcast sky"
     },
     "marks": [
       "UK CAA Part 145",
@@ -57,8 +57,6 @@
     "about": {
       "kicker": "Who we are",
       "heading": "The only stand-alone Part 145 and Part 147 organisation in the UK.",
-      "image": "/img/EXPH-2269-177.jpg",
-      "imageAlt": "A HELI145 engineer working on a helicopter airframe",
       "body": [
         "THEHELIGROUP started in 2017 as a consultancy and grew into something the UK didn't otherwise have: combined helicopter maintenance and type training, under one roof, independent of any operator, AOC, or corporate parent.",
         "That independence is the whole point. No fleet of our own pulls engineers off your aircraft on a bad day. We mobilise quickly, stay competitive, and answer to you. The team are engineers, supervisors, mentors, instructors and assessors with decades on the airframe."
@@ -80,7 +78,9 @@
           "num": "Global",
           "label": "Client base"
         }
-      ]
+      ],
+      "image": "/img/EXPH-2269-177.jpg",
+      "imageAlt": "A HELI145 engineer working on a helicopter airframe"
     },
     "why": {
       "heading": "Three things that don't happen elsewhere.",
@@ -126,10 +126,10 @@
     "maintenance": {
       "tag": "Maintenance",
       "title": "HELI145",
-      "ctaLabel": "Enquire about maintenance",
-      "imageAlt": "Base maintenance work on a helicopter at the Norwich hangar",
       "body": "UK CAA Part 145 maintenance and technical support, line and base. On schedule, on standard, with senior engineers who own the job end to end.",
-      "image": "/img/EXPH-2269-177.jpg"
+      "image": "/img/EXPH-2269-177.jpg",
+      "imageAlt": "Base maintenance work on a helicopter at the Norwich hangar",
+      "ctaLabel": "Enquire about maintenance"
     },
     "related": [
       {
@@ -169,10 +169,10 @@
     "pillar": {
       "tag": "Training",
       "title": "HELI147",
-      "ctaLabel": "Enquire about courses",
-      "imageAlt": "A Part 147 type-training session in progress",
       "body": "UK CAA and EASA Part 147 type training delivered by instructors and assessors with decades on the airframe. Courses run at Norwich, at an OEM facility, or on-site at your hangar.",
-      "image": "/img/resize.webp"
+      "image": "/img/resize.webp",
+      "imageAlt": "A Part 147 type-training session in progress",
+      "ctaLabel": "Enquire about courses"
     },
     "points": [
       {
@@ -214,51 +214,57 @@
         "make": "Leonardo",
         "model": "AW109",
         "note": "",
-        "image": "/img/types/aw109.jpg"
+        "image": "/img/types/aw109.jpg",
+        "featured": false
       },
       {
         "make": "Leonardo",
         "model": "AW119",
         "note": "",
-        "image": "/img/types/aw119.jpg"
+        "image": "/img/types/aw119.jpg",
+        "featured": false
       },
       {
         "make": "Leonardo",
         "model": "AW139",
         "note": "Flagship medium twin. Heavy maintenance and B1.3 training.",
         "image": "/img/types/aw139.jpg",
-        "featured": "true"
+        "featured": true
       },
       {
         "make": "Leonardo",
         "model": "AW169",
         "note": "Light intermediate. Full Part 145 and type training.",
         "image": "/img/types/aw169.jpg",
-        "featured": "true"
+        "featured": true
       },
       {
         "make": "Leonardo",
         "model": "AW189",
         "note": "",
-        "image": "/img/types/aw189.jpg"
+        "image": "/img/types/aw189.jpg",
+        "featured": false
       },
       {
         "make": "Airbus",
         "model": "H125",
         "note": "",
-        "image": "/img/types/h125.jpg"
+        "image": "/img/types/h125.jpg",
+        "featured": false
       },
       {
         "make": "Airbus",
         "model": "H145",
         "note": "",
-        "image": "/img/types/h145.jpg"
+        "image": "/img/types/h145.jpg",
+        "featured": false
       },
       {
         "make": "Airbus",
         "model": "BK117 C2 / D2 / D3",
         "note": "",
-        "image": "/img/types/bk117.jpg"
+        "image": "/img/types/bk117.jpg",
+        "featured": false
       }
     ]
   },

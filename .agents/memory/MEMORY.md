@@ -1,1 +1,0 @@
-- [Artifact kind is immutable](artifact-kind-immutable.md) — cannot change `kind` field after creation; fix is to create a new artifact with the correct kind.

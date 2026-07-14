@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<%- include('../partials/head', { title: content.home.seoTitle, desc: content.home.seoDescription, content: content }) %>
+<%- include('../partials/head', { title: content.home.seoTitle, desc: content.home.seoDescription, content: content, preloadImage: content.home.hero.image }) %>
 </head>
 <body>
 <%- include('../partials/header', { content: content, currentHref: '/' }) %>

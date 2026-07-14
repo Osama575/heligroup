@@ -1,0 +1,87 @@
+# THEHELIGROUP
+
+Server-rendered marketing site + file-based CMS + Claude-powered chat agent for
+THEHELIGROUP, an independent UK helicopter maintenance (Part 145) and training
+(Part 147) organisation.
+
+- **Site** — EJS pages rendered from editable content (`content/content.json`).
+- **CMS** — `/admin`, password-protected. Sectioned tabs for every page, image
+  uploads (auto-optimised to WebP), and a **Chatbot** tab where you curate the
+  Q&A the assistant answers from.
+- **Chat** — Claude with tools (calendar availability + booking), streamed over
+  SSE, grounded on the business knowledge base plus the CMS-maintained FAQ.
+
+## Run locally
+
+```bash
+cp .env.example .env      # set ADMIN_PASSWORD; ANTHROPIC_API_KEY is optional
+npm install
+npm start                 # http://localhost:3000   ·   CMS at /admin
+```
+
+`npm run dev` restarts on change. The site and CMS run without an API key; chat
+just returns a friendly "not configured" message until `ANTHROPIC_API_KEY` is set.
+
+## Environment
+
+| Var | Purpose |
+| --- | --- |
+| `ADMIN_PASSWORD` | CMS login. Without it, `/admin` is disabled in production (the public site still runs). |
+| `ADMIN_SECRET` | HMAC secret for admin sessions (`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`). Without it, admin logins reset on each restart. |
+| `ANTHROPIC_API_KEY` | Enables the chat agent. Optional. |
+| `ANTHROPIC_MODEL` | Chat model (default `claude-sonnet-4-6`). |
+| `NODE_ENV` | Optional — the app defaults itself to `production`. Set `development` locally for template hot-reload and the dev admin password. |
+| `DATA_DIR` | Where mutable data lives. Unset = repo (dev). In production, a persistent disk/folder. |
+| `AOG_PHONE` / `AOG_WHATSAPP` | Numbers the chat hands out for AOG situations. |
+
+## Content & uploads
+
+`content/content.json` is the whole editable site; pages render from it and the
+CMS writes to it. Uploaded images are re-encoded to capped WebP and stored under
+`DATA_DIR/public/img/uploads/`, served (with long immutable caching) at
+`/img/uploads/…`.
+
+## Deploying (persistent host + disk)
+
+This app **writes files**, so it needs a long-running host with a **persistent
+disk** — not a serverless/ephemeral filesystem, where edits and uploads would be
+lost on redeploy.
+
+1. Provision a disk / writable folder outside the app root.
+2. Set `DATA_DIR` to that path. On first boot the committed `content.json` is
+   copied there as the seed; edits persist there after.
+3. Set `ADMIN_PASSWORD` and `ADMIN_SECRET`.
+
+A ready-to-use **Render** blueprint is in [`render.yaml`](render.yaml) (Starter
+plan or higher, for the disk). The same shape works on Railway/Fly (attach a
+volume), a VPS, or Hostinger (below).
+
+> Rate limiting is per-process in-memory (fine for one instance). If you scale to
+> multiple instances, move the limiter and sessions to a shared store (Redis).
+
+## Hostinger notes (Node.js app / VPS)
+
+Redeploy checklist — every pull:
+
+1. `git pull`
+2. **`npm install` — mandatory.** Dependencies change between releases; skipping
+   it crashes the app at boot (`ERR_MODULE_NOT_FOUND`).
+3. Restart the app (hPanel → Node.js → Restart, or `pm2 restart heligroup`).
+
+Environment (hPanel → Node.js → Environment variables, or `.env`):
+
+- `ADMIN_PASSWORD` + `ADMIN_SECRET` — without them the public site runs but
+  `/admin` stays disabled (it never falls back to a default password in
+  production).
+- `DATA_DIR` — a folder outside the app root (e.g. `/home/uXXXX/heligroup-data`)
+  so CMS edits and uploads survive redeploys.
+- `NODE_ENV` — optional; the app defaults itself to `production`.
+
+Performance on shared hosting:
+
+- Passenger idles the app and cold-boots it on the next visit. Keep it warm with
+  a 5-minute ping to `/healthz` (hPanel cron: `curl -s https://yoursite/healthz`,
+  or a free UptimeRobot monitor).
+- Compression, long-lived asset caching, and lazy loading of heavy modules are
+  built in — no server tuning needed. On a VPS behind nginx, also set
+  `proxy_buffering off` so the chat stream isn't buffered.
