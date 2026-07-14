@@ -275,7 +275,7 @@ button { font-family: inherit; }
 
 .logo {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   font-family: var(--font-display);
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -283,6 +283,7 @@ button { font-family: inherit; }
   color: var(--hdr-fg);
   transition: color 0.3s var(--ease);
 }
+.logo-img { height: 36px; width: auto; }
 .logo-mark { color: inherit; }
 .logo-mark--accent { color: var(--accent); }
 
@@ -449,7 +450,7 @@ button { font-family: inherit; }
   max-width: 46ch;
   margin: 0 0 34px;
 }
-.hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+.hero-cta { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
 
 .hero-marks {
   position: absolute;
@@ -876,7 +877,8 @@ button { font-family: inherit; }
   gap: 36px;
   align-items: start;
 }
-.logo--footer { font-size: 1.2rem; color: var(--ink); }
+.logo--footer { color: var(--ink); }
+.logo--footer .logo-img { height: 30px; }
 .footer-tag { margin: 14px 0 0; color: var(--ink-muted); font-size: 0.9rem; max-width: 32ch; }
 .footer-nav { display: flex; flex-wrap: wrap; gap: 8px 22px; }
 .footer-nav a { color: var(--ink-dim); font-size: 0.9rem; transition: color 0.18s var(--ease); }
