@@ -8,25 +8,24 @@
 //   2. npm install
 //   3. npm start   →   http://localhost:3000   (CMS at /admin)
 
-import "dotenv/config";
+import "./lib/env.js"; // dotenv + NODE_ENV default — must stay the first import
 import express from "express";
+import compression from "compression";
 import cookieParser from "cookie-parser";
 import multer from "multer";
 import crypto from "crypto";
-import Anthropic from "@anthropic-ai/sdk";
-import sharp from "sharp";
 import { fileURLToPath } from "url";
 import path from "path";
+import { statSync } from "fs";
 import { writeFile } from "fs/promises";
 
 import { SYSTEM_PROMPT, faqSystemBlock } from "./business-context.js";
-import { TOOLS, dispatchTool } from "./lib/tools.js";
 import { loadContent, saveContent } from "./lib/content.js";
 import { UPLOAD_DIR } from "./lib/paths.js";
 import { createRateLimiter } from "./lib/rate-limit.js";
 import {
   verifyPassword, issueSessionCookie, clearSessionCookie,
-  getSession, requireAuth, csrfToken, verifyCsrf,
+  getSession, requireAuth, csrfToken, verifyCsrf, authConfigured,
 } from "./lib/auth.js";
 import { notifyVisit } from "./lib/visit-email.js";
 
@@ -36,20 +35,61 @@ const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 const MAX_TOOL_TURNS = 6;
 
 // Chat is optional — the site + CMS run without an API key (chat just returns an error).
-const anthropic = process.env.ANTHROPIC_API_KEY
-  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-  : null;
-if (!anthropic) console.warn("  [chat] ANTHROPIC_API_KEY not set — /api/chat disabled, rest of site runs.");
+const CHAT_ENABLED = Boolean(process.env.ANTHROPIC_API_KEY);
+if (!CHAT_ENABLED) console.warn("  [chat] ANTHROPIC_API_KEY not set — /api/chat disabled, rest of site runs.");
+
+// The chat stack (Anthropic SDK + tools + luxon + date-holidays) and sharp are
+// heavy to import. On hosts that idle the process (Passenger), boot time is
+// first-visit latency — so load them lazily on the routes that need them, not
+// at boot. Cached after first use.
+let chatDepsPromise = null;
+function getChatDeps() {
+  chatDepsPromise ??= Promise.all([import("@anthropic-ai/sdk"), import("./lib/tools.js")])
+    .then(([{ default: Anthropic }, tools]) => ({
+      anthropic: new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }),
+      TOOLS: tools.TOOLS,
+      dispatchTool: tools.dispatchTool,
+    }))
+    .catch((err) => { chatDepsPromise = null; throw err; });
+  return chatDepsPromise;
+}
+let sharpPromise = null;
+function getSharp() {
+  sharpPromise ??= import("sharp").then((m) => m.default)
+    .catch((err) => { sharpPromise = null; throw err; });
+  return sharpPromise;
+}
 
 const app = express();
 app.set("trust proxy", true);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+// Explicit rather than NODE_ENV-inferred, so template caching can never be lost
+// to import-order or host-config surprises. Costly to miss: EJS recompiles every
+// template on every request without it.
+if (process.env.NODE_ENV !== "development") app.set("view cache", true);
+
+// Gzip everything except the SSE chat stream (compression buffers, which would
+// hold back streamed tokens). Images are skipped automatically (not compressible).
+app.use(compression({
+  filter: (req, res) => (req.path === "/api/chat" ? false : compression.filter(req, res)),
+}));
 
 app.use(express.json({ limit: "256kb" }));
 app.use(express.urlencoded({ extended: true, limit: "512kb" }));
 app.use(cookieParser());
 app.use((_req, res, next) => { res.setHeader("X-Content-Type-Options", "nosniff"); next(); });
+
+// Cache-busting version for CSS/JS references (?v=...): derived from the files'
+// mtimes at boot, so a deploy that changes them mints a new URL and the old one
+// can be cached hard. Exposed to every EJS render via app.locals.
+app.locals.assetV = (() => {
+  try {
+    const files = ["styles.css", "script.js", "admin.css", "admin.js"];
+    const newest = Math.max(...files.map((f) => statSync(path.join(__dirname, "public", f)).mtimeMs));
+    return Math.round(newest).toString(36);
+  } catch { return "1"; }
+})();
 // Serve uploaded images from UPLOAD_DIR (which lives on the persistent disk in
 // production, outside ./public). Names are server-generated UUIDs — validate
 // strictly against traversal, and cache hard since each name is immutable.
@@ -63,7 +103,17 @@ app.get("/img/uploads/:name", (req, res) => {
   );
 });
 
-app.use(express.static(path.join(__dirname, "public"), { index: false }));
+app.use(express.static(path.join(__dirname, "public"), {
+  index: false,
+  setHeaders(res, filePath) {
+    if (/\.(css|js)$/i.test(filePath)) {
+      // Safe to cache forever: every reference carries ?v=<assetV>, which changes on deploy.
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    } else if (/\.(jpe?g|png|webp|avif|gif|svg|ico)$/i.test(filePath)) {
+      res.setHeader("Cache-Control", "public, max-age=604800, stale-while-revalidate=86400");
+    }
+  },
+}));
 
 // ---------- Rate limits (per IP; correct for a single persistent process) ----------
 const chatLimiter = createRateLimiter({ windowMs: 5 * 60_000, max: 20 });
@@ -83,7 +133,11 @@ const upload = multer({
 // ---------- Page routes ----------
 const PAGES = { "/": "home", "/services": "services", "/training": "training", "/fleet": "fleet", "/contact": "contact" };
 for (const [route, view] of Object.entries(PAGES)) {
-  app.get(route, (_req, res) => res.render(`pages/${view}`, { content: loadContent() }));
+  app.get(route, (_req, res) => {
+    // Always revalidate HTML so CMS edits show up immediately (assets cache hard instead).
+    res.set("Cache-Control", "no-cache");
+    res.render(`pages/${view}`, { content: loadContent() });
+  });
 }
 
 // ---------- Visit notifier ----------
@@ -107,6 +161,12 @@ app.post("/api/visit", (req, res) => {
 
 // ---------- Admin / CMS ----------
 app.get("/admin", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  if (!authConfigured) {
+    return res.status(503).type("text/plain").send(
+      "Admin is disabled: set the ADMIN_PASSWORD (and ADMIN_SECRET) environment variables on the server, then restart. The public site is unaffected."
+    );
+  }
   const session = getSession(req);
   if (!session) return res.render("admin/login", { error: req.query.error === "1" });
   res.render("admin/editor", {
@@ -247,6 +307,7 @@ app.post(
     try {
       // Re-encode to WebP: strips metadata, caps dimensions, keeps the file small
       // so an uploaded image can never bloat the live site. Animated GIFs stay animated.
+      const sharp = await getSharp();
       const animated = req.file.mimetype === "image/gif";
       let pipeline = sharp(req.file.buffer, { animated, limitInputPixels: 50_000_000 });
       if (!animated) pipeline = pipeline.rotate().resize({ width: 1920, height: 1920, fit: "inside", withoutEnlargement: true });
@@ -278,6 +339,9 @@ app.post("/api/chat", async (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache, no-transform");
   res.setHeader("Connection", "keep-alive");
+  // Tell buffering reverse proxies (nginx, LiteSpeed — e.g. in front of
+  // Hostinger's Passenger) to pass SSE chunks through as they arrive.
+  res.setHeader("X-Accel-Buffering", "no");
   res.flushHeaders?.();
 
   const send = (event, data) => {
@@ -290,8 +354,17 @@ app.post("/api/chat", async (req, res) => {
     return res.end();
   }
 
-  if (!anthropic) {
+  if (!CHAT_ENABLED) {
     send("error", { message: "Chat isn't configured on this server. Email info@heli145.com and we'll come back to you." });
+    return res.end();
+  }
+
+  let anthropic, TOOLS, dispatchTool;
+  try {
+    ({ anthropic, TOOLS, dispatchTool } = await getChatDeps());
+  } catch (err) {
+    console.error("chat deps failed to load:", err);
+    send("error", { message: "Sorry, something went wrong on our side." });
     return res.end();
   }
 
@@ -347,6 +420,11 @@ app.get("/healthz", (_req, res) => res.json({ ok: true, model: MODEL }));
 
 // ---------- 404 ----------
 app.use((req, res) => {
+  // Missing images (e.g. fleet types not uploaded yet) get a cheap, cacheable 404
+  // so browsers stop re-asking and each miss doesn't cost a full HTML render.
+  if (req.path.startsWith("/img/")) {
+    return res.status(404).set("Cache-Control", "public, max-age=86400").end();
+  }
   res.status(404).type("html").send(
     `<!doctype html><meta charset="utf-8"><title>Not found</title>` +
     `<div style="font-family:system-ui;min-height:100vh;display:grid;place-items:center;background:#0a0f1a;color:#e8edf6;text-align:center">` +
@@ -357,5 +435,5 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`\n  THEHELIGROUP running at http://localhost:${PORT}`);
   console.log(`  CMS:   http://localhost:${PORT}/admin`);
-  console.log(`  Model: ${MODEL}${anthropic ? "" : " (chat disabled)"}\n`);
+  console.log(`  Model: ${MODEL}${CHAT_ENABLED ? "" : " (chat disabled)"}\n`);
 });

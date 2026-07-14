@@ -16,9 +16,9 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
-  <link rel="stylesheet" href="/admin.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Archivo:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=<%= assetV %>" />
+  <link rel="stylesheet" href="/admin.css?v=<%= assetV %>" />
 </head>
 <%
   const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -219,6 +219,6 @@
   <% if (typeof saved !== "undefined" && saved) { %><div class="toast" data-toast>Saved. <a href="/" target="_blank" rel="noopener">View site ↗</a></div><% } %>
   <% if (typeof err !== "undefined" && err) { %><div class="toast toast--error" data-toast>Couldn't save: <%= err %></div><% } %>
 
-  <script src="/admin.js" defer></script>
+  <script src="/admin.js?v=<%= assetV %>" defer></script>
 </body>
 </html>
